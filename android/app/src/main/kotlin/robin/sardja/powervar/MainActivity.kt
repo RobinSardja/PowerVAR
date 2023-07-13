@@ -1,4 +1,4 @@
-package com.example.powervar
+package robin.sardja.powervar
 
 import io.flutter.embedding.android.FlutterActivity
 
