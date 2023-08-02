@@ -18,7 +18,7 @@ Future<void> main() async {
       home: MainApp(
         camDesc: camList.first, // TO DO: let user choose camera
         camRes: ResolutionPreset.max, // TO DO: let user choose quality
-      )
+      ),
     )
   );
 }
@@ -44,6 +44,7 @@ class _MainAppState extends State<MainApp> {
   // initialize camera controls
   late CameraController _camControl;
   late Future<void> _initializeCamControlFuture;
+  
   // create and initialize camera controller
   @override
   void initState() {
@@ -67,17 +68,19 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar( title: const Text('PowerVAR') ),
-      body: FutureBuilder<void>(
-        future: _initializeCamControlFuture,
-        builder: (context, snapshot) {
-          if( snapshot.connectionState == ConnectionState.done) {
-            // if Future is complete, display cam preview
-            return CameraPreview (_camControl );
-          } else {
-            // else display loading indicator
-            return const Center( child: CircularProgressIndicator() );
-          }
-        },
+      body: Center(
+        child: FutureBuilder<void>(
+          future: _initializeCamControlFuture,
+          builder: (context, snapshot) {
+            if( snapshot.connectionState == ConnectionState.done) {
+              // if Future is complete, display cam preview
+              return CameraPreview (_camControl );
+            } else {
+              // else display loading indicator
+              return const Center( child: CircularProgressIndicator() );
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         // take picture when button is pressed
@@ -103,6 +106,25 @@ class _MainAppState extends State<MainApp> {
           }
         },
         child: const Icon(Icons.camera_alt),  
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.photo_camera),
+            label: 'Camera',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          )
+        ],
+        selectedFontSize: 0, // hide icon label
+        iconSize: 32, // enlargen icon size
+        currentIndex: 1, // start app with camera selected
       ),
     );
   }
