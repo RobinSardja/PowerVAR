@@ -10,6 +10,25 @@ Future<void> main() async {
   // initialize cameras for use
   WidgetsFlutterBinding.ensureInitialized();
   final camList = await availableCameras();
+  BottomNavigationBar navBar = BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.photo_camera),
+            label: 'Camera',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          )
+        ],
+        selectedFontSize: 0, // hide icon label
+        iconSize: 32, // enlargen icon size
+        currentIndex: 1, // start app with camera selected
+      );
 
   runApp(
     MaterialApp(
@@ -18,6 +37,7 @@ Future<void> main() async {
       home: MainApp(
         camDesc: camList.first, // TO DO: let user choose camera
         camRes: ResolutionPreset.max, // TO DO: let user choose quality
+        navBar: navBar,
       ),
     )
   );
@@ -29,11 +49,13 @@ class MainApp extends StatefulWidget {
     super.key,
     required this.camDesc,
     required this.camRes,
+    required this.navBar,
   });
 
   // initialize properties of camera in use
   final CameraDescription camDesc;
   final ResolutionPreset camRes;
+  final BottomNavigationBar navBar;
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -102,30 +124,13 @@ class _MainAppState extends State<MainApp> {
               )
             );
           } catch(e) {
-            // error code
+            // TO DO: implement error code
           }
         },
-        child: const Icon(Icons.camera_alt),  
+        child: const Icon(Icons.camera_alt),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.photo_camera),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          )
-        ],
-        selectedFontSize: 0, // hide icon label
-        iconSize: 32, // enlargen icon size
-        currentIndex: 1, // start app with camera selected
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      bottomNavigationBar: widget.navBar,
     );
   }
 }
