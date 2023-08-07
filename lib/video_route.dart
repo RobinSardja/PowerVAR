@@ -1,16 +1,21 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoRoute extends StatefulWidget {
-  final String filePath;
+import 'package:gallery_saver/gallery_saver.dart';
 
-  const VideoRoute( {Key? key, required this.filePath}) : super(key: key);
+class VideoRoute extends StatefulWidget {
+  const VideoRoute({
+    super.key,
+    required this.filePath,
+  });
+
+  final String filePath;
+  final String albumName = "PowerVAR";
 
   @override
-  _VideoRouteState createState() => _VideoRouteState();
+  State<VideoRoute> createState() => _VideoRouteState();
 }
 
 class _VideoRouteState extends State<VideoRoute> {
@@ -29,6 +34,30 @@ class _VideoRouteState extends State<VideoRoute> {
     await _videoPlayerController.play();
   }
 
+  // save video to gallery
+  _saveToGallery() async {
+    await GallerySaver.saveVideo(
+      widget.filePath,
+      albumName: widget.albumName,
+      );
+    File(widget.filePath).deleteSync();
+    if( context.mounted ) {
+      showAdaptiveDialog(
+        context: context,
+        builder: (context) => AlertDialog.adaptive(
+          title: const Text("Saved!"),
+          content: const Text("Lift saved to gallery!"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, "Ok"),
+              child: const Text("Ok"),
+            )
+          ]
+        )
+      );
+    }
+  }
+
   @override
   Widget build( BuildContext context ) {
     return Scaffold(
@@ -37,20 +66,7 @@ class _VideoRouteState extends State<VideoRoute> {
         actions: [
           IconButton(
             icon: const Icon( Icons.check ),
-            // TO DO: save video to gallery
-            onPressed: () => showAdaptiveDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog.adaptive(
-                title: const Text("Saved!"),
-                content: const Text("Lift saved to gallery"),
-                actions: [
-                  TextButton(
-                    child: const Text("Ok"),
-                    onPressed: () => Navigator.pop( context, "OK" ),
-                  )
-                ],
-              ),
-            ),
+            onPressed: () => _saveToGallery(),
           ),
         ],
       ),

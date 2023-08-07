@@ -47,11 +47,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<!-- Access cam and mic on iOS -->
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access needed to record user during lift.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access needed to record audio during lift.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Gallery access needed to save lift recording to device.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

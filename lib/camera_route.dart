@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'video_route.dart';
 
@@ -41,7 +43,57 @@ class _CameraRouteState extends State<CameraRoute> {
       widget.camRes, // define resolution quality to use
     );
 
-    _initializeCamControlFuture = _camControl.initialize();
+    _initializeCamControlFuture = _camControl.initialize().then( (_) {
+      if( !mounted ) {
+        return;
+      }
+      setState(() {});
+    }).catchError((Object e) {
+      // handle permission restrictions
+      if( e is CameraException ) {
+        switch( e.code ) {
+          case 'CameraAccessDenied':
+            showAdaptiveDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => AlertDialog.adaptive(
+                title: const Text("Camera Denied"),
+                content: const Text("PowerVAR needs your camera to record your lifts"),
+                actions: [
+                  TextButton(
+                    onPressed: () => exit(0),
+                    child: const Text("Exit"),
+                  ),
+                  TextButton(
+                    onPressed: () => openAppSettings(),
+                    child: const Text("Grant Access"),
+                  ),
+                ]
+              )
+            );
+            break;
+          case 'AudioAccessDenied':
+            showAdaptiveDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => AlertDialog.adaptive(
+                title: const Text("Microphone Denied"),
+                content: const Text("PowerVAR needs your microphone to record your lifts"),
+                actions: [
+                  TextButton(
+                    onPressed: () => exit(0),
+                    child: const Text("Exit"),
+                  ),
+                  TextButton(
+                    onPressed: () => openAppSettings(),
+                    child: const Text("Grant Access"),
+                  )
+                ]
+              )
+            );
+        }
+      }
+    });
   }
 
   // dispose of the controller
