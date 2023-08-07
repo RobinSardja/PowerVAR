@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+
+import 'video_route.dart';
 
 // CameraRoute holds the camera route
 class CameraRoute extends StatefulWidget {
@@ -19,14 +20,17 @@ class CameraRoute extends StatefulWidget {
   final BottomNavigationBar navBar;
 
   @override
-  State<CameraRoute> createState() => _MainAppState();
+  State<CameraRoute> createState() => _CameraRouteState();
 }
 
-class _MainAppState extends State<CameraRoute> {
+class _CameraRouteState extends State<CameraRoute> {
 
   // initialize camera controls
   late CameraController _camControl;
   late Future<void> _initializeCamControlFuture;
+
+  // initialize flag variable to detect when user is recording
+  bool _isRecording = false;
   
   // create and initialize camera controller
   @override
@@ -47,68 +51,50 @@ class _MainAppState extends State<CameraRoute> {
     super.dispose();
   }
 
+  _recordVideo() async {
+    if( _isRecording ) {
+      final file = await _camControl.stopVideoRecording();
+      setState( () => _isRecording = false );
+      final route = MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => VideoRoute( filePath: file.path ),
+      );
+      if(context.mounted) {
+        Navigator.push( context, route );
+      }
+    } else {
+      await _camControl.prepareForVideoRecording();
+      await _camControl.startVideoRecording();
+      setState( () => _isRecording = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // show loading screen while initializing camera
     return Scaffold(
       appBar: AppBar( title: const Text('PowerVAR') ),
       body: Center(
         child: FutureBuilder<void>(
           future: _initializeCamControlFuture,
           builder: (context, snapshot) {
-            if( snapshot.connectionState == ConnectionState.done) {
+            if( snapshot.connectionState == ConnectionState.done ) {
               // if Future is complete, display cam preview
-              return CameraPreview (_camControl );
+              return CameraPreview( _camControl );
             } else {
               // else display loading indicator
-              return const Center( child: CircularProgressIndicator() );
+              return const Center( child: CircularProgressIndicator.adaptive() );
             }
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        // take picture when button is pressed
-        onPressed: () async {
-          try {
-            // ensure camera is initialized
-            await _initializeCamControlFuture;
-            // take picture and get image file
-            final image = await _camControl.takePicture();
-
-            if( !mounted ) return;
-
-            // if picture taken, display on new screen
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  imagePath: image.path,
-                )
-              )
-            );
-          } catch(e) {
-            // TO DO: implement error code
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+        // record video when button is pressed
+        child: Icon( _isRecording ? Icons.stop : Icons.circle ),
+        onPressed: () => _recordVideo(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: widget.navBar,
-    );
-  }
-}
-
-// display the image taken
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({super.key, required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-    appBar: AppBar(
-      title: const Text('Your Lift')),
-      // display image stored as file on device with 'Image.file' constructor
-      body: Image.file(File(imagePath)),
     );
   }
 }

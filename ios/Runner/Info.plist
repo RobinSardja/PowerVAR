@@ -52,5 +52,10 @@
 	<string>Camera access needed to record user during lift.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access needed to record audio during lift.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

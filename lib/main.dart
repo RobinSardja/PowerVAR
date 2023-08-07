@@ -9,6 +9,8 @@ Future<void> main() async {
   // initialize cameras for use
   WidgetsFlutterBinding.ensureInitialized();
   final camList = await availableCameras();
+
+  // initialize navigation bar for use
   BottomNavigationBar navBar = BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -34,7 +36,7 @@ Future<void> main() async {
       debugShowCheckedModeBanner: false, // disable debug banner
       theme: ThemeData.dark(),
       home: CameraRoute(
-        camDesc: camList.first, // TO DO: let user choose camera
+        camDesc: camList.first, // TO DO: let user choose front or back camera
         camRes: ResolutionPreset.max, // TO DO: let user choose quality
         navBar: navBar,
       ),
