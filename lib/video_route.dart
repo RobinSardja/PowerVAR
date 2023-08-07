@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart';
 
+import 'package:video_player/video_player.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 
 class VideoRoute extends StatefulWidget {
@@ -60,6 +61,11 @@ class _VideoRouteState extends State<VideoRoute> {
 
   @override
   Widget build( BuildContext context ) {
+    // enforce portrait orientation
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ]);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Lift'),

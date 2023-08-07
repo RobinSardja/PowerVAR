@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'video_route.dart';
@@ -12,13 +14,14 @@ class CameraRoute extends StatefulWidget {
   const CameraRoute({
     super.key,
     required this.camDesc,
-    required this.camRes,
     required this.navBar,
   });
 
+  // initialize cameras for use
+
   // initialize properties of camera in use
-  final CameraDescription camDesc;
-  final ResolutionPreset camRes;
+  final CameraDescription camDesc; // TO DO: let user choose front or back cam
+  final ResolutionPreset camRes = ResolutionPreset.max; // TO DO: let user choose quality
   final BottomNavigationBar navBar;
 
   @override
@@ -123,6 +126,10 @@ class _CameraRouteState extends State<CameraRoute> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ]);
     // show loading screen while initializing camera
     return Scaffold(
       appBar: AppBar( title: const Text('PowerVAR') ),
