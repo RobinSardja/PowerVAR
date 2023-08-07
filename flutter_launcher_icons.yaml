@@ -10,18 +10,3 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_channel_ios: true
   remove_alpha_ios: true # deprecated warning?
-
-  web:
-    generate: true
-    image_path: "assets/final icon.png"
-    background_color: "#fff"
-    theme_color: "#fff"
-
-  windows:
-    generate: true
-    image_path: "assets/final icon.png"
-    icon_size: 48 # min:48, max:256, default: 48
-
-  macos:
-    generate: true
-    image_path: "assets/final icon.png"
