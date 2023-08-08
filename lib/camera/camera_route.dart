@@ -73,12 +73,12 @@ class _CameraRouteState extends State<CameraRoute> {
                 content: const Text("PowerVAR needs your camera to record your lifts"),
                 actions: [
                   TextButton(
-                    onPressed: () => exit(0),
-                    child: const Text("Exit"),
-                  ),
-                  TextButton(
                     onPressed: () => openAppSettings(),
                     child: const Text("Grant Access"),
+                  ),
+                  TextButton(
+                    onPressed: () => exit(0),
+                    child: const Text("Exit"),
                   ),
                 ]
               )
@@ -93,13 +93,13 @@ class _CameraRouteState extends State<CameraRoute> {
                 content: const Text("PowerVAR needs your microphone to record your lifts"),
                 actions: [
                   TextButton(
+                    onPressed: () => openAppSettings(),
+                    child: const Text("Grant Access"),
+                  ),
+                  TextButton(
                     onPressed: () => exit(0),
                     child: const Text("Exit"),
                   ),
-                  TextButton(
-                    onPressed: () => openAppSettings(),
-                    child: const Text("Grant Access"),
-                  )
                 ]
               )
             );
@@ -179,7 +179,7 @@ class _CameraRouteState extends State<CameraRoute> {
             if( snapshot.connectionState == ConnectionState.done ) {
               // if Future is complete, display cam preview w/ pose detection
               return DetectorView(
-                title: "New Lift",
+                title: "Upload from Gallery",
                 customPaint: _customPaint,
                 text: _text,
                 onImage: _detectPoses,

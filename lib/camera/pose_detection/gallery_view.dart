@@ -5,7 +5,7 @@ import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:image_picker/image_picker.dart';
 
 class GalleryView extends StatefulWidget {
-  GalleryView(
+  const GalleryView(
       {Key? key,
       required this.title,
       this.text,
@@ -36,25 +36,6 @@ class _GalleryViewState extends State<GalleryView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: widget.onDetectorViewModeChanged,
-                child: Icon(
-                  Platform.isIOS ? Icons.camera_alt_outlined : Icons.camera,
-                ),
-              ),
-            ),
-          ],
-        ),
-        body: _galleryBody());
-  }
-
-  Widget _galleryBody() {
     return ListView(shrinkWrap: true, children: [
       _image != null
           ? SizedBox(
@@ -67,21 +48,21 @@ class _GalleryViewState extends State<GalleryView> {
                 ],
               ),
             )
-          : Icon(
+          : const Icon(
               Icons.image,
               size: 200,
             ),
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ElevatedButton(
-          child: Text('From Gallery'),
+          child: const Text('From Gallery'),
           onPressed: () => _getImage(ImageSource.gallery),
         ),
       ),
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
         child: ElevatedButton(
-          child: Text('Take a picture'),
+          child: const Text('Use Camera'),
           onPressed: () => _getImage(ImageSource.camera),
         ),
       ),
