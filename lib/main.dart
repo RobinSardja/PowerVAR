@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:camera/camera.dart';
-
 import 'camera/camera_route.dart';
 
 // asynchronous main function to compensate for camera feed delays
 Future<void> main() async {
 
     WidgetsFlutterBinding.ensureInitialized();
-    final camList = await availableCameras();
 
   // initialize navigation bar for use
   BottomNavigationBar navBar = BottomNavigationBar(
@@ -36,7 +33,6 @@ Future<void> main() async {
       debugShowCheckedModeBanner: false, // disable debug banner
       theme: ThemeData.dark(),
       home: CameraRoute(
-        camDesc: camList.first,
         navBar: navBar,
       ),
     )
