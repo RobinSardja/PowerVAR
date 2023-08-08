@@ -77,57 +77,45 @@ class _CameraViewState extends State<CameraView> {
         children: <Widget>[
           Center(
             child: _changingCameraLens
-                ? Center(
-                    child: const Text('Changing camera lens'),
+                ? const Center(
+                    child: Text('Changing camera lens'),
                   )
                 : CameraPreview(
                     _controller!,
                     child: widget.customPaint,
                   ),
           ),
-          _switchLiveCameraToggle(),
-          _detectionViewModeToggle(),
+          _uploadFromGallery(),
+          _flipCamera(),
         ],
       ),
     );
   }
 
-  Widget _detectionViewModeToggle() => Positioned(
-        bottom: 8,
-        left: 8,
-        child: SizedBox(
-          height: 50.0,
-          width: 50.0,
-          child: FloatingActionButton(
+  Widget _uploadFromGallery() => Positioned(
+        bottom: 16,
+        left: 16,
+        child: FloatingActionButton(
             heroTag: Object(),
             onPressed: widget.onDetectorViewModeChanged,
-            backgroundColor: Colors.black54,
-            child: Icon(
+            child: const Icon(
               Icons.photo_library_outlined,
-              size: 25,
             ),
           ),
-        ),
       );
 
-  Widget _switchLiveCameraToggle() => Positioned(
-        bottom: 8,
-        right: 8,
-        child: SizedBox(
-          height: 50.0,
-          width: 50.0,
+  Widget _flipCamera() => Positioned(
+        bottom: 16,
+        right: 16,
           child: FloatingActionButton(
             heroTag: Object(),
             onPressed: _switchLiveCamera,
-            backgroundColor: Colors.black54,
             child: Icon(
-              Platform.isIOS
-                  ? Icons.flip_camera_ios_outlined
-                  : Icons.flip_camera_android_outlined,
-              size: 25,
+              Platform.isAndroid
+                  ? Icons.flip_camera_android_outlined
+                  : Icons.flip_camera_ios_outlined,
             ),
           ),
-        ),
       );
 
   Future _startLiveFeed() async {
