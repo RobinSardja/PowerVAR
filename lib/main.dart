@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:camera/camera.dart';
 
-import 'camera_route.dart';
+import 'camera/camera_route.dart';
 
 // asynchronous main function to compensate for camera feed delays
 Future<void> main() async {
