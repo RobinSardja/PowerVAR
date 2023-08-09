@@ -22,20 +22,34 @@ class PosePainter extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0
-      ..color = Colors.green;
-
-    final leftPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
-      ..color = Colors.yellow;
-
-    final rightPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
-      ..color = Colors.blueAccent;
+      ..color = Colors.red;
 
     for (final pose in poses) {
       pose.landmarks.forEach((_, landmark) {
+        // ignore face, fingers, and toes
+        if( landmark == pose.landmarks[PoseLandmarkType.nose] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftEyeInner] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftEye] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftEyeOuter] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightEyeInner] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightEye] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightEyeOuter] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftEar] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightEar] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftMouth] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightMouth] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftPinky] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightPinky] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftIndex] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightIndex] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftThumb] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightThumb] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftHeel] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightHeel] ||
+            landmark == pose.landmarks[PoseLandmarkType.leftFootIndex] ||
+            landmark == pose.landmarks[PoseLandmarkType.rightFootIndex] ) {
+          return;
+        }
         canvas.drawCircle(
             Offset(
               translateX(
@@ -96,29 +110,22 @@ class PosePainter extends CustomPainter {
       }
 
       //Draw arms
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
-          rightPaint);
-      paintLine(
-          PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
+      paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, paint );
+      paintLine( PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, paint );
+      paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow, paint );
+      paintLine( PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, paint );
 
       //Draw Body
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint);
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
-          rightPaint);
+      paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, paint );
+      paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip, paint );
+      paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder, paint );
+      paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.rightHip, paint );
 
       //Draw legs
-      paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
-      paintLine(
-          PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
+      paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, paint );
+      paintLine( PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, paint );
+      paintLine( PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, paint );
+      paintLine( PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, paint );
     }
   }
 
