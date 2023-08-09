@@ -98,7 +98,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Widget _uploadFromGallery() => Positioned(
-    bottom: 16,
+    bottom: 16, // TO DO: use proper centering
     left: 16,
     child: FloatingActionButton(
       heroTag: Object(),
@@ -111,8 +111,8 @@ class _CameraViewState extends State<CameraView> {
 
   Widget _recordButton() => Positioned(
     bottom: 16,
-    left: 172,
-    right: 172,
+    left: 128,
+    right: 128,
     child: FloatingActionButton(
       heroTag: Object(),
       onPressed: () => _recordVideo(),
@@ -151,6 +151,8 @@ class _CameraViewState extends State<CameraView> {
       if (!mounted) {
         return;
       }
+       setState(() {});
+
       await _controller.prepareForVideoRecording();
       _controller.startImageStream(_processCameraImage).then((value) {
         if (widget.onCameraFeedReady != null) {
@@ -160,7 +162,6 @@ class _CameraViewState extends State<CameraView> {
           widget.onCameraLensDirectionChanged!(camera.lensDirection);
         }
       });
-      setState(() {});
     });
   }
 
@@ -191,6 +192,8 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Future _switchLiveCamera() async {
+    if( _isRecording ) return;
+
     setState(() => _changingCameraLens = true);
     _cameraIndex = (_cameraIndex + 1) % _cameras.length;
 

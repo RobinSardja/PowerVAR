@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'camera/camera_route.dart';
 
-// asynchronous main function to compensate for camera feed delays
-Future<void> main() async {
+void main() {
 
   WidgetsFlutterBinding.ensureInitialized();
 
