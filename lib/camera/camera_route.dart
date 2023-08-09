@@ -24,10 +24,6 @@ class CameraRoute extends StatefulWidget {
 
 class _CameraRouteState extends State<CameraRoute> {
 
-
-  // initialize flag variable to detect when user is recording
-  bool _isRecording = false;
-
   // initialize pose detection variables
   final _poseDetector = PoseDetector( options: PoseDetectorOptions() );
   bool _canProcess = true;
@@ -71,25 +67,6 @@ class _CameraRouteState extends State<CameraRoute> {
     }
   }
 
-  // // record video
-  // _recordVideo() async {
-  //   if( _isRecording ) {
-  //     final file = await _camControl.stopVideoRecording();
-  //     setState( () => _isRecording = false );
-  //     final route = MaterialPageRoute(
-  //       fullscreenDialog: true,
-  //       builder: (_) => VideoRoute( filePath: file.path ),
-  //     );
-  //     if(context.mounted) {
-  //       Navigator.push( context, route );
-  //     }
-  //   } else {
-  //     await _camControl.prepareForVideoRecording();
-  //     await _camControl.startVideoRecording();
-  //     setState( () => _isRecording = true);
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -109,12 +86,6 @@ class _CameraRouteState extends State<CameraRoute> {
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        // record video when button is pressed
-        child: Icon( _isRecording ? Icons.stop : Icons.circle ),
-        onPressed: () => {} // _recordVideo(),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: widget.navBar,
     );
   }

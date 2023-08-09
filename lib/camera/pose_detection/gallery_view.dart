@@ -60,7 +60,7 @@ class _GalleryViewState extends State<GalleryView> {
         ),
       ),
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ElevatedButton(
           child: const Text('Use Camera'),
           onPressed: () => _getImage(ImageSource.camera),

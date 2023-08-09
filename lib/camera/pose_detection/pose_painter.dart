@@ -20,8 +20,9 @@ class PosePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4.0
+      // TO DO: let user customize overlay
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 3.0
       ..color = Colors.red;
 
     for (final pose in poses) {
@@ -67,7 +68,7 @@ class PosePainter extends CustomPainter {
                 cameraLensDirection,
               ),
             ),
-            1,
+            5,
             paint);
       });
 
@@ -109,19 +110,19 @@ class PosePainter extends CustomPainter {
             paintType);
       }
 
-      //Draw arms
+      // paint arms
       paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, paint );
       paintLine( PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, paint );
       paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow, paint );
       paintLine( PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, paint );
 
-      //Draw Body
+      // paint body
       paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, paint );
       paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip, paint );
       paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder, paint );
       paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.rightHip, paint );
 
-      //Draw legs
+      //paint legs
       paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, paint );
       paintLine( PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, paint );
       paintLine( PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, paint );

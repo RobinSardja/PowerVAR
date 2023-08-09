@@ -1,9 +1,12 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:camera/camera.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+
+import 'video_route.dart';
 
 class CameraView extends StatefulWidget {
   const CameraView(
@@ -29,9 +32,10 @@ class CameraView extends StatefulWidget {
 
 class _CameraViewState extends State<CameraView> {
   static List<CameraDescription> _cameras = [];
-  CameraController? _controller;
+  late CameraController _controller;
   int _cameraIndex = -1;
   bool _changingCameraLens = false;
+  bool _isRecording = false;
 
   @override
   void initState() {
@@ -58,6 +62,7 @@ class _CameraViewState extends State<CameraView> {
   @override
   void dispose() {
     _stopLiveFeed();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -68,8 +73,7 @@ class _CameraViewState extends State<CameraView> {
 
   Widget _liveFeedBody() {
     if (_cameras.isEmpty) return Container();
-    if (_controller == null) return Container();
-    if (_controller?.value.isInitialized == false) return Container();
+    if (_controller.value.isInitialized == false) return Container();
     return Container(
       color: Colors.black,
       child: Stack(
@@ -78,14 +82,15 @@ class _CameraViewState extends State<CameraView> {
           Center(
             child: _changingCameraLens
                 ? const Center(
-                    child: Text('Changing camera lens'),
+                    child: Text('Flipping Camera'),
                   )
                 : CameraPreview(
-                    _controller!,
+                    _controller,
                     child: widget.customPaint,
                   ),
           ),
           _uploadFromGallery(),
+          _recordButton(),
           _flipCamera(),
         ],
       ),
@@ -93,30 +98,43 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Widget _uploadFromGallery() => Positioned(
-        bottom: 16,
-        left: 16,
-        child: FloatingActionButton(
-            heroTag: Object(),
-            onPressed: widget.onDetectorViewModeChanged,
-            child: const Icon(
-              Icons.photo_library_outlined,
-            ),
-          ),
-      );
+    bottom: 16,
+    left: 16,
+    child: FloatingActionButton(
+      heroTag: Object(),
+      onPressed: () => widget.onDetectorViewModeChanged,
+      child: const Icon(
+        Icons.photo_library_outlined,
+      ),
+    ),
+  );
+
+  Widget _recordButton() => Positioned(
+    bottom: 16,
+    left: 172,
+    right: 172,
+    child: FloatingActionButton(
+      heroTag: Object(),
+      onPressed: () => _recordVideo(),
+      child: Icon(
+        _isRecording ? Icons.square : Icons.circle,
+      )
+    ),
+  );
 
   Widget _flipCamera() => Positioned(
-        bottom: 16,
-        right: 16,
-          child: FloatingActionButton(
-            heroTag: Object(),
-            onPressed: _switchLiveCamera,
-            child: Icon(
-              Platform.isAndroid
-                  ? Icons.flip_camera_android_outlined
-                  : Icons.flip_camera_ios_outlined,
-            ),
-          ),
-      );
+    bottom: 16,
+    right: 16,
+    child: FloatingActionButton(
+      heroTag: Object(),
+      onPressed: _switchLiveCamera,
+      child: Icon(
+        Platform.isAndroid
+            ? Icons.flip_camera_android_outlined
+            : Icons.flip_camera_ios_outlined,
+      ),
+    ),
+  );
 
   Future _startLiveFeed() async {
     final camera = _cameras[_cameraIndex];
@@ -129,11 +147,12 @@ class _CameraViewState extends State<CameraView> {
           ? ImageFormatGroup.nv21
           : ImageFormatGroup.bgra8888,
     );
-    _controller?.initialize().then((_) {
+    _controller.initialize().then((_) async {
       if (!mounted) {
         return;
       }
-      _controller?.startImageStream(_processCameraImage).then((value) {
+      await _controller.prepareForVideoRecording();
+      _controller.startImageStream(_processCameraImage).then((value) {
         if (widget.onCameraFeedReady != null) {
           widget.onCameraFeedReady!();
         }
@@ -146,9 +165,29 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Future _stopLiveFeed() async {
-    await _controller?.stopImageStream();
-    await _controller?.dispose();
-    _controller = null;
+    try{
+      await _controller.stopImageStream();
+    } on CameraException {
+      return;
+    }
+    await _controller.dispose();
+    _controller.dispose();
+  }
+
+  _recordVideo() async {
+    if( _isRecording ) {
+      final file = await _controller.stopVideoRecording();
+      setState( () => _isRecording = false );
+      final route = MaterialPageRoute(
+        builder: (_) => VideoRoute( filePath: file.path ),
+      );
+      if( context.mounted ) {
+        Navigator.push( context, route );
+      }
+    } else {
+      setState( () => _isRecording = true );
+      await _controller.startVideoRecording(); // ERROR: causes multiple camera previews, need to end previous preview before starting new one
+    }
   }
 
   Future _switchLiveCamera() async {
@@ -174,7 +213,6 @@ class _CameraViewState extends State<CameraView> {
   };
 
   InputImage? _inputImageFromCameraImage(CameraImage image) {
-    if (_controller == null) return null;
 
     // get image rotation
     // it is used in android to convert the InputImage from Dart to Java: https://github.com/flutter-ml/google_ml_kit_flutter/blob/master/packages/google_mlkit_commons/android/src/main/java/com/google_mlkit_commons/InputImageConverter.java
@@ -189,7 +227,7 @@ class _CameraViewState extends State<CameraView> {
       rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
     } else if (Platform.isAndroid) {
       var rotationCompensation =
-          _orientations[_controller!.value.deviceOrientation];
+          _orientations[_controller.value.deviceOrientation];
       if (rotationCompensation == null) return null;
       if (camera.lensDirection == CameraLensDirection.front) {
         // front-facing
