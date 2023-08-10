@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'video_route.dart';
 
@@ -41,10 +42,29 @@ class _CameraViewState extends State<CameraView> {
   void initState() {
     super.initState();
 
-    _initialize();
+    // _controller = CameraController(_cameras[0], ResolutionPreset.max);
+    // _controller.initialize().then((_) {
+    //   if (!mounted) {
+    //     return;
+    //   }
+    //   setState(() {});
+    // }).catchError((Object e) {
+    //   if (e is CameraException) {
+    //     switch (e.code) {
+    //       case 'CameraAccessDenied':
+    //         // Handle access errors here.
+    //         break;
+    //       default:
+    //         // Handle other errors here.
+    //         break;
+    //     }
+    //   }
+    // });
+
+   _initialize();
   }
 
-  void _initialize() async {
+  Future<void> _initialize() async {
     if (_cameras.isEmpty) {
       _cameras = await availableCameras();
     }
@@ -82,7 +102,7 @@ class _CameraViewState extends State<CameraView> {
           Center(
             child: _changingCameraLens
                 ? const Center(
-                    child: Text('Flipping Camera'),
+                    child: CircularProgressIndicator.adaptive(),
                   )
                 : CameraPreview(
                     _controller,
@@ -136,6 +156,54 @@ class _CameraViewState extends State<CameraView> {
     ),
   );
 
+  // handle permission restrictions
+  _handlePerms(Object e) {
+    if( e is CameraException ) {
+      switch( e.code ) {
+        case 'CameraAccessDenied':
+          showAdaptiveDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => AlertDialog.adaptive(
+              title: const Text("Camera Denied"),
+              content: const Text("PowerVAR needs your camera to record your lifts"),
+              actions: [
+                TextButton(
+                  onPressed: () => exit(0),
+                  child: const Text("Exit"),
+                ),
+                TextButton(
+                  onPressed: () => { openAppSettings() },
+                  child: const Text("Grant Access"),
+                ),
+              ]
+            )
+          );
+          break;
+        case 'AudioAccessDenied':
+          showAdaptiveDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => AlertDialog.adaptive(
+              title: const Text("Microphone Denied"),
+              content: const Text("PowerVAR needs your microphone to record your lifts"),
+              actions: [
+                TextButton(
+                  onPressed: () => exit(0),
+                  child: const Text("Exit"),
+                ),
+                TextButton(
+                  onPressed: () => { openAppSettings() },
+                  child: const Text("Grant Access"),
+                )
+              ]
+            )
+          );
+          break;
+      }
+    }
+  }
+
   Future _startLiveFeed() async {
     final camera = _cameras[_cameraIndex];
     _controller = CameraController(
@@ -148,9 +216,7 @@ class _CameraViewState extends State<CameraView> {
           : ImageFormatGroup.bgra8888,
     );
     _controller.initialize().then((_) async {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
        setState(() {});
 
       await _controller.prepareForVideoRecording();
@@ -162,6 +228,8 @@ class _CameraViewState extends State<CameraView> {
           widget.onCameraLensDirectionChanged!(camera.lensDirection);
         }
       });
+    }).catchError((Object e) {
+      _handlePerms(e);
     });
   }
 
