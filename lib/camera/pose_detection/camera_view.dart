@@ -42,25 +42,6 @@ class _CameraViewState extends State<CameraView> {
   void initState() {
     super.initState();
 
-    // _controller = CameraController(_cameras[0], ResolutionPreset.max);
-    // _controller.initialize().then((_) {
-    //   if (!mounted) {
-    //     return;
-    //   }
-    //   setState(() {});
-    // }).catchError((Object e) {
-    //   if (e is CameraException) {
-    //     switch (e.code) {
-    //       case 'CameraAccessDenied':
-    //         // Handle access errors here.
-    //         break;
-    //       default:
-    //         // Handle other errors here.
-    //         break;
-    //     }
-    //   }
-    // });
-
    _initialize();
   }
 
@@ -118,7 +99,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Widget _uploadFromGallery() => Positioned(
-    bottom: 16, // TO DO: use proper centering
+    bottom: 16,
     left: 16,
     child: FloatingActionButton(
       heroTag: Object(),
@@ -131,7 +112,7 @@ class _CameraViewState extends State<CameraView> {
 
   Widget _recordButton() => Positioned(
     bottom: 16,
-    left: 128,
+    left: 128, // TO DO: use proper centering
     right: 128,
     child: FloatingActionButton(
       heroTag: Object(),
@@ -208,8 +189,7 @@ class _CameraViewState extends State<CameraView> {
     final camera = _cameras[_cameraIndex];
     _controller = CameraController(
       camera,
-      // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
-      ResolutionPreset.high,
+      ResolutionPreset.high, // max does not work on some phones
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.nv21
@@ -255,7 +235,7 @@ class _CameraViewState extends State<CameraView> {
       }
     } else {
       setState( () => _isRecording = true );
-      await _controller.startVideoRecording(); // ERROR: causes multiple camera previews, need to end previous preview before starting new one
+      await _controller.startVideoRecording(); // TO DO: causes multiple camera previews, need to end previous preview before starting new one
     }
   }
 
@@ -285,14 +265,8 @@ class _CameraViewState extends State<CameraView> {
 
   InputImage? _inputImageFromCameraImage(CameraImage image) {
 
-    // get image rotation
-    // it is used in android to convert the InputImage from Dart to Java: https://github.com/flutter-ml/google_ml_kit_flutter/blob/master/packages/google_mlkit_commons/android/src/main/java/com/google_mlkit_commons/InputImageConverter.java
-    // `rotation` is not used in iOS to convert the InputImage from Dart to Obj-C: https://github.com/flutter-ml/google_ml_kit_flutter/blob/master/packages/google_mlkit_commons/ios/Classes/MLKVisionImage%2BFlutterPlugin.m
-    // in both platforms `rotation` and `camera.lensDirection` can be used to compensate `x` and `y` coordinates on a canvas: https://github.com/flutter-ml/google_ml_kit_flutter/blob/master/packages/example/lib/vision_detector_views/painters/coordinates_translator.dart
     final camera = _cameras[_cameraIndex];
     final sensorOrientation = camera.sensorOrientation;
-    // print(
-    //     'lensDirection: ${camera.lensDirection}, sensorOrientation: $sensorOrientation, ${_controller?.value.deviceOrientation} ${_controller?.value.lockedCaptureOrientation} ${_controller?.value.isCaptureOrientationLocked}');
     InputImageRotation? rotation;
     if (Platform.isIOS) {
       rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
@@ -309,17 +283,12 @@ class _CameraViewState extends State<CameraView> {
             (sensorOrientation - rotationCompensation + 360) % 360;
       }
       rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
-      // print('rotationCompensation: $rotationCompensation');
     }
     if (rotation == null) return null;
-    // print('final rotation: $rotation');
 
     // get image format
     final format = InputImageFormatValue.fromRawValue(image.format.raw);
     // validate format depending on platform
-    // only supported formats:
-    // * nv21 for Android
-    // * bgra8888 for iOS
     if (format == null ||
         (Platform.isAndroid && format != InputImageFormat.nv21) ||
         (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;

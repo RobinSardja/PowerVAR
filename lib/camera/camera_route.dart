@@ -11,12 +11,7 @@ import 'pose_detection/pose_painter.dart';
 
 // CameraRoute holds the camera route
 class CameraRoute extends StatefulWidget {
-  const CameraRoute({
-    super.key,
-    required this.navBar,
-  });
-
-  final BottomNavigationBar navBar;
+  const CameraRoute({super.key});
 
   @override
   State<CameraRoute> createState() => _CameraRouteState();
@@ -31,6 +26,24 @@ class _CameraRouteState extends State<CameraRoute> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back; // TO DO: use camera lens direction from camDesc
+
+  // TO DO: change route based on selected index
+  int _selectedIndex = 1;
+  void _changeIndex(int index) {
+    if( index == _selectedIndex ) return;
+    setState( () {_selectedIndex = index;} );
+    switch( index ) {
+      case 0:
+        Navigator.pushNamed( context, "Home" );
+        break;
+      case 1:
+        Navigator.pushNamed( context, "Camera" );
+        break;
+      case 2:
+        Navigator.pushNamed( context, "Settings" );
+        break;
+    }
+  }
 
   // dispose of the controller
   @override
@@ -86,7 +99,26 @@ class _CameraRouteState extends State<CameraRoute> {
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
       ),
-      bottomNavigationBar: widget.navBar,
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.photo_camera),
+            label: 'Camera',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          )
+        ],
+        selectedFontSize: 0, // hide icon label
+        iconSize: 32, // enlargen icon size
+        currentIndex: _selectedIndex,
+        onTap: (index) => _changeIndex(index),
+      ),
     );
   }
 }
