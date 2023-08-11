@@ -89,11 +89,12 @@ class _CameraRouteState extends State<CameraRoute> {
     // show loading screen while initializing camera
     return SizedBox.expand(
       child: GestureDetector( // swiping to navigate between routes
-        onPanUpdate: (details) {
-          if( details.delta.dx > 0 ) { // swipe right
+        onHorizontalDragUpdate: (details) {
+          const sensitivity = 10;
+          if( details.delta.dx > sensitivity ) { // swipe right
             _changeIndex( _selectedIndex - 1);
           }
-          if( details.delta.dx < 0 ) { // swipe left
+          if( details.delta.dx < -sensitivity ) { // swipe left
           _changeIndex( _selectedIndex + 1);
           }
         },

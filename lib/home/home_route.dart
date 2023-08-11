@@ -31,12 +31,10 @@ class _HomeRouteState extends State<HomeRoute> {
   Widget build(BuildContext context) {
     return SizedBox.expand(
       child: GestureDetector(
-        onPanUpdate: (details) {
-          if( details.delta.dx > 0 ) { // swipe right
-            _changeIndex( _selectedIndex - 1);
-          }
-          if( details.delta.dx < 0 ) { // swipe left
-          _changeIndex( _selectedIndex + 1);
+        onHorizontalDragUpdate: (details) {
+          const sensitivity = 10;
+          if( details.delta.dx < -sensitivity ) { // swipe left
+          _changeIndex( _selectedIndex + 1 );
           }
         },
         child: Scaffold(
