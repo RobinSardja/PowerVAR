@@ -16,13 +16,13 @@ class _SettingsRouteState extends State<SettingsRoute> {
     setState( () {_selectedIndex = index;} );
     switch( index ) {
       case 0:
-        Navigator.pushNamed( context, "Home" );
+        Navigator.pushReplacementNamed( context, "Home" );
         break;
       case 1:
-        Navigator.pushNamed( context, "Camera" );
+        Navigator.pushReplacementNamed( context, "Camera" );
         break;
       case 2:
-        Navigator.pushNamed( context, "Settings" );
+        Navigator.pushReplacementNamed( context, "Settings" );
         break;
     }
   }
