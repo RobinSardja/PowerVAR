@@ -34,12 +34,12 @@ class _HomeRouteState extends State<HomeRoute> {
         onHorizontalDragUpdate: (details) {
           const sensitivity = 10;
           if( details.delta.dx < -sensitivity ) { // swipe left
-          _changeIndex( _selectedIndex + 1 );
+            _changeIndex( _selectedIndex + 1 );
           }
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text( "Home" ),
+            title: const Text( "PowerVAR" ),
             automaticallyImplyLeading: false,
           ),
           bottomNavigationBar: BottomNavigationBar(

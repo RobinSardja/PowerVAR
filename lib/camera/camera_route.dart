@@ -100,7 +100,7 @@ class _CameraRouteState extends State<CameraRoute> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('PowerVAR'),
+            title: const Text('New Lift'),
             automaticallyImplyLeading: false,
           ),
           body: Center(
