@@ -20,22 +20,21 @@ void main() {
       }
     )
   );
-  
+
+  // runApp( const PowerVAR() );
+
 }
 
-// class RouteTemplate extends StatefulWidget {
-//   const RouteTemplate({
-//     super.key,
-//     required this.appBarTitle,
-//     });
-
-//   final Text appBarTitle;
+// class PowerVAR extends StatefulWidget {
+//   const PowerVAR({ super.key });
 
 //   @override
-//   State<RouteTemplate> createState() => RouteTemplateState();
+//   State<PowerVAR> createState() => _PowerVARState();
 // }
 
-// class RouteTemplateState extends State<RouteTemplate> {
+// class _PowerVARState extends State<PowerVAR> {
+
+//   Text appBarTitle = const Text( "PowerVAR" );
 
 //   // handles nav bar changing routes
 //   int _selectedIndex = 0;
@@ -45,12 +44,15 @@ void main() {
 //     switch( index ) {
 //       case 0:
 //         Navigator.pushReplacementNamed( context, "Home" );
+//         appBarTitle = const Text( "PowerVAR" );
 //         break;
 //       case 1:
 //         Navigator.pushReplacementNamed( context, "Camera" );
+//         appBarTitle = const Text( "New Lift" );
 //         break;
 //       case 2:
 //         Navigator.pushReplacementNamed( context, "Settings" );
+//         appBarTitle = const Text( "Settings" );
 //         break;
 //     }
 //   }
@@ -91,7 +93,7 @@ void main() {
 //         },
 //         child: Scaffold(
 //           appBar: AppBar(
-//             title: widget.appBarTitle,
+//             title: appBarTitle,
 //             automaticallyImplyLeading: false,
 //           ),
 //           bottomNavigationBar: bottomNavigationBar,
