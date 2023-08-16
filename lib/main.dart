@@ -54,44 +54,31 @@ class _MainRouteState extends State<MainRoute> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown
     ]);
-    return SizedBox.expand(
-      child: GestureDetector(
-        onHorizontalDragUpdate: (details) {
-          const sensitivity = 10;
-          if( _selectedIndex > 0 && details.delta.dx > sensitivity ) { // swipe right
-            _changeIndex( _selectedIndex - 1 );
-          }
-          if( _selectedIndex < 2 && details.delta.dx < -sensitivity ) { // swipe left
-          _changeIndex( _selectedIndex + 1 );
-          }
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: appBarTitle,
-            automaticallyImplyLeading: false,
+    return Scaffold(
+      appBar: AppBar(
+        title: appBarTitle,
+        automaticallyImplyLeading: false,
+      ),
+      body: _routes[ _selectedIndex ],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
-          body: _routes[ _selectedIndex ],
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.photo_camera),
-                label: 'Camera',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
-              )
-            ],
-            selectedFontSize: 0, // hide icon label
-            iconSize: 32, // enlargen icon size
-            currentIndex: _selectedIndex,
-            onTap: (index) => _changeIndex(index),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.photo_camera),
+            label: 'Camera',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          )
+        ],
+        selectedFontSize: 0, // hide icon label
+        iconSize: 32, // enlargen icon size
+        currentIndex: _selectedIndex,
+        onTap: (index) => _changeIndex(index),
       ),
     );
   } 
