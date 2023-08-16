@@ -35,7 +35,9 @@ class MainRoute extends StatefulWidget {
 
 class _MainRouteState extends State<MainRoute> {
 
-  Text appBarTitle = const Text( "PowerVAR" );
+  // nav bar styling variables
+  static const double selectedFontSize = 0;
+  static const double iconSize = 32;
 
   // handles nav bar changing routes
   int _selectedIndex = 1;
@@ -44,7 +46,13 @@ class _MainRouteState extends State<MainRoute> {
     CameraRoute(),
     SettingsRoute(),
   ];
+  static const List<Text> _appBarTitles = <Text>[
+    Text( "PowerVAR" ),
+    Text( "New Lift" ),
+    Text( "Settings" ),
+  ];
   void _changeIndex(int index) {
+    if( index == _selectedIndex ) return;
     setState( () {_selectedIndex = index;} );
   }
 
@@ -54,10 +62,11 @@ class _MainRouteState extends State<MainRoute> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown
     ]);
+
     return Scaffold(
       appBar: AppBar(
-        title: appBarTitle,
-        automaticallyImplyLeading: false,
+        title: _appBarTitles[ _selectedIndex ],
+        automaticallyImplyLeading: false, // removes back button
       ),
       body: _routes[ _selectedIndex ],
       bottomNavigationBar: BottomNavigationBar(
@@ -75,8 +84,8 @@ class _MainRouteState extends State<MainRoute> {
             label: 'Settings',
           )
         ],
-        selectedFontSize: 0, // hide icon label
-        iconSize: 32, // enlargen icon size
+        selectedFontSize: selectedFontSize, // hide icon label
+        iconSize: iconSize, // enlargen icon size
         currentIndex: _selectedIndex,
         onTap: (index) => _changeIndex(index),
       ),

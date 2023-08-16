@@ -9,10 +9,35 @@ class HomeRoute extends StatefulWidget {
 
 class _HomeRouteState extends State<HomeRoute> {
 
+  // home styling variables
+  // static const EdgeInsets padding = EdgeInsets.all(16);
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center( child: Text( "Home" ), ),
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text( "PowerVAR" ),
+          Image.asset( "assets/home icon.png" ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text( "New Lift" ),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text( "Settings" ),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text( "Support" ),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text( "Help and About" ),
+          ),
+        ],
+      ),
     );
   } 
 }
