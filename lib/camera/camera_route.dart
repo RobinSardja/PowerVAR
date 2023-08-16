@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
@@ -26,24 +25,6 @@ class _CameraRouteState extends State<CameraRoute> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back; // TO DO: use camera lens direction from camDesc
-
-  // handles nav bar changing routes
-  int _selectedIndex = 1;
-  void _changeIndex(int index) {
-    if( index == _selectedIndex ) return;
-    setState( () {_selectedIndex = index;} );
-    switch( index ) {
-      case 0:
-        Navigator.pushReplacementNamed( context, "Home" );
-        break;
-      case 1:
-        Navigator.pushReplacementNamed( context, "Camera" );
-        break;
-      case 2:
-        Navigator.pushReplacementNamed( context, "Settings" );
-        break;
-    }
-  }
 
   // dispose of the controller
   @override
@@ -82,57 +63,15 @@ class _CameraRouteState extends State<CameraRoute> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown
-    ]);
-    // show loading screen while initializing camera
-    return SizedBox.expand(
-      child: GestureDetector( // swiping to navigate between routes
-        onHorizontalDragUpdate: (details) {
-          const sensitivity = 10;
-          if( details.delta.dx > sensitivity ) { // swipe right
-            _changeIndex( _selectedIndex - 1);
-          }
-          if( details.delta.dx < -sensitivity ) { // swipe left
-          _changeIndex( _selectedIndex + 1);
-          }
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('New Lift'),
-            automaticallyImplyLeading: false,
-          ),
-          body: Center(
-            child: DetectorView(
-              title: "",
-              customPaint: _customPaint,
-              text: _text,
-              onImage: _detectPoses,
-              initialCameraLensDirection: _cameraLensDirection,
-              onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
-            ),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.photo_camera),
-                label: 'Camera',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
-              )
-            ],
-            selectedFontSize: 0, // hide icon label
-            iconSize: 32, // enlargen icon size
-            currentIndex: _selectedIndex,
-            onTap: (index) => _changeIndex(index),
-          ),
+    return Scaffold(
+      body: Center(
+        child: DetectorView(
+          title: "",
+          customPaint: _customPaint,
+          text: _text,
+          onImage: _detectPoses,
+          initialCameraLensDirection: _cameraLensDirection,
+          onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
       ),
     );
