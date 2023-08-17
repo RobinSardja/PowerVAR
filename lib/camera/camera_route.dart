@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:powervar/camera/pose_detection/detector_view.dart';
 
+import 'pose_detection/detector_view.dart';
 import 'pose_detection/pose_painter.dart';
 
 // CameraRoute holds the camera route

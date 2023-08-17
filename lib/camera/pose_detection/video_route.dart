@@ -22,8 +22,6 @@ class VideoRoute extends StatefulWidget {
 class _VideoRouteState extends State<VideoRoute> {
   late VideoPlayerController _videoPlayerController;
 
-  bool _liftSaved = false;
-
   @override
   void dispose() {
     _videoPlayerController.dispose();
@@ -38,49 +36,39 @@ class _VideoRouteState extends State<VideoRoute> {
   }
 
   // save video to gallery
-  _saveToGallery(int item) async {
-    if( item == 1 && _liftSaved == false ) {
-      showAdaptiveDialog(
-        context: context,
-        builder: (context) => AlertDialog.adaptive(
-          title: const Text("Ready to Delete"),
-          content: const Text("You can still save this lift before you start another! Exiting the lift preview automatically deletes lifts."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, "Ok"),
-              child: const Text("Ok"),
-            )
-          ]
-        )
-      );
-    } else if( _liftSaved == false ) {
-      await GallerySaver.saveVideo(
-        widget.filePath,
-        albumName: widget.albumName,
-        );
-      File(widget.filePath).deleteSync();
-      if( context.mounted ) {
+  _saveToGallery(int selected) async {
+    switch( selected ) {
+      case 1:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text( 'Saved to Gallery!' ),
+            content: const Text( 'Lift deleted' ),
             action: SnackBarAction(
               label: "OK",
               onPressed: () {},
             ),
           ),
         );
-      }
-      _liftSaved = true;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text( 'Lift already saved!' ),
-          action: SnackBarAction(
-              label: "OK",
-              onPressed: () {},
-          ),
-        ),
-      );
+        Navigator.pop(context);
+        break;
+      case 0:
+        await GallerySaver.saveVideo(
+          widget.filePath,
+          albumName: widget.albumName,
+          );
+        File(widget.filePath).deleteSync();
+        if( context.mounted ) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text( 'Saved to gallery!' ),
+              action: SnackBarAction(
+                label: "OK",
+                onPressed: () {},
+              ),
+            ),
+          );
+        }
+        if(context.mounted) Navigator.pop(context);
+        break;
     }
   }
 
@@ -94,6 +82,7 @@ class _VideoRouteState extends State<VideoRoute> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lift Preview'),
+        automaticallyImplyLeading: false,
       ),
       body: FutureBuilder(
         future: _initVideoPlayer(),
@@ -101,7 +90,7 @@ class _VideoRouteState extends State<VideoRoute> {
           if( state.connectionState == ConnectionState.done ) {
             return VideoPlayer(_videoPlayerController);
           } else {
-            return const Center( child: CircularProgressIndicator.adaptive() );
+            return const Center( child: Text( "Loading Lift" ), );
           }
         }
       ),

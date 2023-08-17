@@ -83,7 +83,7 @@ class _CameraViewState extends State<CameraView> {
           Center(
             child: _changingCameraLens
                 ? const Center(
-                    child: CircularProgressIndicator.adaptive(),
+                    child: Text( "Flipping Camera" ),
                   )
                 : CameraPreview(
                     _controller,
@@ -128,7 +128,7 @@ class _CameraViewState extends State<CameraView> {
     right: 16,
     child: FloatingActionButton(
       heroTag: Object(),
-      onPressed: _switchLiveCamera,
+      onPressed: () => _switchLiveCamera(1),
       child: Icon(
         Platform.isAndroid
             ? Icons.flip_camera_android_outlined
@@ -224,26 +224,28 @@ class _CameraViewState extends State<CameraView> {
   }
 
   _recordVideo() async {
+
     if( _isRecording ) {
       final file = await _controller.stopVideoRecording();
       setState( () => _isRecording = false );
       final route = MaterialPageRoute(
         builder: (_) => VideoRoute( filePath: file.path ),
       );
+      _switchLiveCamera(0);
       if( context.mounted ) {
         Navigator.push( context, route );
       }
     } else {
       setState( () => _isRecording = true );
-      await _controller.startVideoRecording(); // TO DO: causes multiple camera previews, need to end previous preview before starting new one
+      await _controller.startVideoRecording( onAvailable: _processCameraImage ); // TO DO: causes multiple camera previews, need to end previous preview before starting new one
     }
   }
 
-  Future _switchLiveCamera() async {
-    if( _isRecording ) return;
+  Future _switchLiveCamera(int camNum) async {
+    if( _isRecording ) return; // TO DO: switching the camera stops recording, temporary fix
 
     setState(() => _changingCameraLens = true);
-    _cameraIndex = (_cameraIndex + 1) % _cameras.length;
+    _cameraIndex = (_cameraIndex + camNum) % _cameras.length;
 
     await _stopLiveFeed();
     await _startLiveFeed();

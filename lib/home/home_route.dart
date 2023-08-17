@@ -9,9 +9,6 @@ class HomeRoute extends StatefulWidget {
 
 class _HomeRouteState extends State<HomeRoute> {
 
-  // home styling variables
-  // static const EdgeInsets padding = EdgeInsets.all(16);
-
   @override
   Widget build(BuildContext context) {
     return Center(
