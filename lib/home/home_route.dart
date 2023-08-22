@@ -9,11 +9,16 @@ class HomeRoute extends StatefulWidget {
 
 class _HomeRouteState extends State<HomeRoute> {
 
-  static const _imageWidth = 250.0;
+  static const _fontSize = 24.0;
+  static const _imageWidth = 300.0;
+  static const _padding = EdgeInsets.all(8.0);
   static const _minButtonWidth = 200.0;
-  static const _minButtonHeight = 25.0;
+  static const _minButtonHeight = 50.0;
   static const _buttonStyle = ButtonStyle(
     minimumSize: MaterialStatePropertyAll( Size( _minButtonWidth, _minButtonHeight ) ),
+  );
+  static const _textStyle = TextStyle(
+    fontSize: _fontSize,
   );
 
   @override
@@ -22,30 +27,63 @@ class _HomeRouteState extends State<HomeRoute> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text( "PowerVAR" ),
-          Image.asset(
-            "assets/home icon.png",
-            width: _imageWidth,
+          const Padding(
+            padding: _padding,
+            child: Text(
+              "PowerVAR",
+              style: _textStyle,
+            ),
           ),
-          ElevatedButton(
-            style: _buttonStyle,
-            onPressed: () {},
-            child: const Text( "New Lift" ),
+          Padding(
+            padding: _padding,
+            child: Image.asset(
+              "assets/home icon.png",
+              width: _imageWidth,
+            ),
           ),
-          ElevatedButton(
-            style: _buttonStyle,
-            onPressed: () {},
-            child: const Text( "Settings" ),
+          Padding(
+            padding: _padding,
+            child: ElevatedButton(
+              style: _buttonStyle,
+              onPressed: () {},
+              child: const Text(
+                "New Lift",
+                style: _textStyle,
+              ),
+            ),
           ),
-          ElevatedButton(
-            style: _buttonStyle,
-            onPressed: () {},
-            child: const Text( "Support" ),
+          Padding(
+            padding: _padding,
+            child: ElevatedButton(
+              style: _buttonStyle,
+              onPressed: () {},
+              child: const Text(
+                "Settings",
+                style: _textStyle,
+              ),
+            ),
           ),
-          ElevatedButton(
-            style: _buttonStyle,
-            onPressed: () {},
-            child: const Text( "Help and About" ),
+          Padding(
+            padding: _padding,
+            child: ElevatedButton(
+              style: _buttonStyle,
+              onPressed: () {},
+              child: const Text(
+                "Support",
+                style: _textStyle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: _padding,
+            child: ElevatedButton(
+              style: _buttonStyle,
+              onPressed: () {},
+              child: const Text(
+                "Help and About",
+                style: _textStyle,
+              ),
+            ),
           ),
         ],
       ),
