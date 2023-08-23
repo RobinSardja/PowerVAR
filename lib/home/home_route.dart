@@ -26,9 +26,14 @@ class _HomeRouteState extends State<HomeRoute> {
       ],
     ),
   );
-  static const _buttonStyle = ButtonStyle(
-    minimumSize: MaterialStatePropertyAll( Size( _minButtonWidth, _minButtonHeight ) ),
-    backgroundColor: MaterialStatePropertyAll( Colors.white ),
+  final _buttonStyle = ButtonStyle(
+    minimumSize: const MaterialStatePropertyAll( Size( _minButtonWidth, _minButtonHeight ) ),
+    shape: MaterialStatePropertyAll(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0),
+      )
+    ),
+    backgroundColor: const MaterialStatePropertyAll( Colors.white ),
   );
   static const _textStyle = TextStyle(
     color: Colors.black,

@@ -64,7 +64,7 @@ class _MainRouteState extends State<MainRoute> {
     ]);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: ( _selectedIndex == 0 ) ? null : AppBar(
         title: _appBarTitles[ _selectedIndex ],
         automaticallyImplyLeading: false, // removes back button
       ),
