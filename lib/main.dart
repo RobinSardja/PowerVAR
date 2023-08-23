@@ -19,7 +19,7 @@ class PowerVAR extends StatelessWidget {
   @override
   Widget build( context ) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // disable debug banner
+      debugShowCheckedModeBanner: false, // disables debug banner
       theme: ThemeData.dark(),
       home: const MainRoute(),
     );
