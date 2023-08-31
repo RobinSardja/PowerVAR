@@ -21,8 +21,16 @@ class PowerVAR extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // disables debug banner
       theme: ThemeData.dark().copyWith(
+        colorScheme: const ColorScheme.dark().copyWith( background: Colors.black, ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
+        snackBarTheme: const SnackBarThemeData(
+          actionTextColor: Colors.black,
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.black,
