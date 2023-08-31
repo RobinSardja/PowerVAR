@@ -20,7 +20,18 @@ class PowerVAR extends StatelessWidget {
   Widget build( context ) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // disables debug banner
-      theme: ThemeData.dark(),
+      theme: ThemeData.dark().copyWith(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.black,
+          selectedItemColor: Colors.red,
+          showSelectedLabels: false,
+          unselectedItemColor: Colors.white,
+          showUnselectedLabels: false,
+        ),
+      ),
       home: const MainRoute(),
     );
   }
@@ -34,10 +45,6 @@ class MainRoute extends StatefulWidget {
 }
 
 class _MainRouteState extends State<MainRoute> {
-
-  // nav bar styling variables
-  static const double selectedFontSize = 0;
-  static const double iconSize = 32;
 
   // handles nav bar changing routes
   int _selectedIndex = 1;
@@ -84,8 +91,6 @@ class _MainRouteState extends State<MainRoute> {
             label: 'Settings',
           )
         ],
-        selectedFontSize: selectedFontSize, // hide icon label
-        iconSize: iconSize, // enlargen icon size
         currentIndex: _selectedIndex,
         onTap: (index) => _changeIndex(index),
       ),

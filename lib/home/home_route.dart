@@ -9,11 +9,11 @@ class HomeRoute extends StatefulWidget {
 
 class _HomeRouteState extends State<HomeRoute> {
 
-  // home route styling variables2
+  // home route styling variables
   static const _titleFontSize = 48.0;
   static const _buttonFontSize = 24.0;
   static const _imageWidth = 300.0;
-  static const _padding = EdgeInsets.all(8.0);
+  static const _padding = EdgeInsets.all(16.0);
   static const _minButtonWidth = 200.0;
   static const _minButtonHeight = 50.0;
   static const _homeBackground = BoxDecoration(
