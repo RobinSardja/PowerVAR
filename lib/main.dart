@@ -32,6 +32,17 @@ Future<void> main() async {
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
                     color: Colors.red,
                 ),
+                switchTheme: SwitchThemeData(
+                    thumbColor:  WidgetStateProperty.resolveWith((state) {
+						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;
+					}),
+                    trackColor: WidgetStateProperty.resolveWith((state) {
+						return state.contains( WidgetState.selected ) ? Colors.red : Colors.white;
+					}),
+                    trackOutlineColor: WidgetStateProperty.resolveWith((state) {
+						return state.contains( WidgetState.selected ) ? Colors.red : Colors.black;
+					}),
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
@@ -60,6 +71,17 @@ Future<void> main() async {
                 ),
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
                     color: Colors.white
+                ),
+                switchTheme: SwitchThemeData(
+                    thumbColor:  WidgetStateProperty.resolveWith((state) {
+						return state.contains( WidgetState.selected ) ? Colors.black : Colors.white;
+					}),
+                    trackColor: WidgetStateProperty.resolveWith((state) {
+						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;
+					}),
+                    trackOutlineColor: const WidgetStatePropertyAll(
+                        Colors.white,
+                    )
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
