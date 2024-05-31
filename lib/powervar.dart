@@ -1,11 +1,18 @@
 import "package:flutter/material.dart";
 
+import "package:camera/camera.dart";
+
 import "camera.dart";
 import "home.dart";
 import "settings.dart";
 
 class PowerVAR extends StatefulWidget {
-	const PowerVAR({super.key});
+	const PowerVAR({
+        super.key,
+        required this.cameras
+    });
+
+    final List<CameraDescription> cameras;
 
 	@override
 	State<PowerVAR> createState() => _PowerVARState();
@@ -33,10 +40,10 @@ class _PowerVARState extends State<PowerVAR> {
                 onPageChanged: (selectedPage) {
                     setState(() {selectedIndex = selectedPage;});
                 },
-                children: const [
-                    HomePage(),
-                    CameraPage(),
-                    SettingsPage()
+                children: [
+                    const HomePage(),
+                    CameraPage( cameras: widget.cameras ),
+                    const SettingsPage()
                 ]
             ),
             bottomNavigationBar: NavigationBar(
