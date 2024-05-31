@@ -25,6 +25,13 @@ Future<void> main() async {
 					foregroundColor: Colors.white,
 				),
 				scaffoldBackgroundColor: Colors.white,
+                floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white
+                ),
+                progressIndicatorTheme: const ProgressIndicatorThemeData(
+                    color: Colors.red,
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
@@ -47,9 +54,16 @@ Future<void> main() async {
 					foregroundColor: Colors.white,
 				),
 				scaffoldBackgroundColor: Colors.black,
+                floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                ),
+                progressIndicatorTheme: const ProgressIndicatorThemeData(
+                    color: Colors.white
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
-					indicatorColor: Colors.red,
+					indicatorColor: Colors.white,
 					iconTheme: WidgetStateProperty.resolveWith((state) {
 						return IconThemeData(
 							color: state.contains( WidgetState.selected ) ? Colors.black : Colors.white

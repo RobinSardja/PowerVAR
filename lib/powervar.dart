@@ -60,7 +60,7 @@ class _PowerVARState extends State<PowerVAR> {
                         label: "Home",
                     ),
                     NavigationDestination(
-                        icon: Icon( Icons.camera ),
+                        icon: Icon( Icons.camera_alt ),
                         label: "Camera",
                     ),
                     NavigationDestination(
