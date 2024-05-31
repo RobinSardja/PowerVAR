@@ -1,3 +1,3 @@
-# powervar
+# PowerVAR
 
-A new Flutter project.
+Video Assistant Referee for Powerlifters and Olympic Weightlifters
