@@ -1,9 +1,7 @@
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
+import "package:flutter/services.dart";
 
-import "camera.dart";
-import "home.dart";
-import "settings.dart";
+import "powervar.dart";
 
 void main() {
 	WidgetsFlutterBinding.ensureInitialized();
@@ -13,30 +11,8 @@ void main() {
 		DeviceOrientation.portraitDown
 	]);
 
-	runApp(const MainApp());
-}
-
-class MainApp extends StatefulWidget {
-	const MainApp({super.key});
-
-	@override
-	State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-
-	// selected index for navigation bar
-	int selectedIndex = 1;
-
-	@override
-	Widget build(BuildContext context) {
-
-		// page controller for page view
-		final pageController = PageController(
-			initialPage: selectedIndex,
-		);
-
-		return MaterialApp(
+	runApp(
+        MaterialApp(
 			debugShowCheckedModeBanner: false,
 			theme: ThemeData.light().copyWith(
 				appBarTheme: const AppBarTheme(
@@ -82,45 +58,7 @@ class _MainAppState extends State<MainApp> {
 					)
 				)
 			),
-			home: Scaffold(
-				appBar: AppBar(
-					title: const Text( "PowerVAR" ),
-				),
-				body: PageView(
-					controller: pageController,
-					onPageChanged: (selectedPage) {
-						setState(() {selectedIndex = selectedPage;});
-					},
-					children: const [
-						HomePage(),
-						CameraPage(),
-						SettingsPage()
-					]
-				),
-				bottomNavigationBar: NavigationBar(
-					onDestinationSelected: ( selectedDestination ) {
-						setState(() {
-							selectedIndex = selectedDestination;
-							pageController.jumpToPage(selectedDestination);
-						});
-					},
-					selectedIndex: selectedIndex,
-					destinations: const [
-						NavigationDestination(
-							icon: Icon( Icons.home ),
-							label: "Home",
-						),
-						NavigationDestination(
-							icon: Icon( Icons.camera ),
-							label: "Camera",
-						),
-						NavigationDestination(
-							icon: Icon( Icons.settings ),
-							label: "Settings",
-						),
-					],
-				),
-			),
-		);
-	}
+            home: const PowerVAR(),
+        )
+    );
 }
