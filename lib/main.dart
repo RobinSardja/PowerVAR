@@ -43,6 +43,15 @@ Future<void> main() async {
 						return state.contains( WidgetState.selected ) ? Colors.red : Colors.black;
 					}),
                 ),
+                snackBarTheme: const SnackBarThemeData(
+                    backgroundColor: Colors.white,
+                    actionTextColor: Colors.black,
+                    closeIconColor: Colors.red,
+                    contentTextStyle: TextStyle(
+                        color: Colors.black,
+                    ),
+                    showCloseIcon: true
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
@@ -82,6 +91,15 @@ Future<void> main() async {
                     trackOutlineColor: const WidgetStatePropertyAll(
                         Colors.white,
                     )
+                ),
+                snackBarTheme: const SnackBarThemeData(
+                    backgroundColor: Colors.white,
+                    actionTextColor: Colors.black,
+                    closeIconColor: Colors.black,
+                    contentTextStyle: TextStyle(
+                        color: Colors.black,
+                    ),
+                    showCloseIcon: true
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
