@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:io";
+import "dart:math";
 
 import "package:flutter/material.dart";
 
@@ -21,8 +22,8 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
-    late VideoPlayerController _videoController;
-    late Future<void> _initializeVideoPlayerFuture;
+    VideoPlayerController? _videoController;
+    Future<void>? _initializeVideoPlayerFuture;
 
 
     bool frontOrBack = false;
@@ -46,8 +47,8 @@ class _CameraPageState extends State<CameraPage> {
 
     @override
     Future<void> dispose() async {
-        await _videoController.dispose();
-        await _cameraController.dispose();
+        _videoController?.dispose();
+        _cameraController.dispose();
 
         super.dispose();
     }
@@ -97,10 +98,10 @@ class _CameraPageState extends State<CameraPage> {
                             
                                             final recording = await _cameraController.stopVideoRecording();
                                             _videoController = VideoPlayerController.file( File(recording.path) );
-                                            _initializeVideoPlayerFuture = _videoController.initialize();
-                            
-                                            await _videoController.setLooping(true);
-                                            await _videoController.play();
+                                            _initializeVideoPlayerFuture = _videoController!.initialize();
+
+                                            await _videoController!.setLooping(true);
+                                            await _videoController!.play();
                             
                                             if( !context.mounted ) return;
                             
@@ -110,7 +111,14 @@ class _CameraPageState extends State<CameraPage> {
                                                         future: _initializeVideoPlayerFuture,
                                                         builder: (context, snapshot) {
                                                             if( snapshot.connectionState == ConnectionState.done ) {
-                                                                return VideoPlayer(_videoController);
+                                                                return AspectRatio(
+                                                                    aspectRatio: _videoController!.value.aspectRatio,
+                                                                    child: Transform(
+                                                                        alignment: Alignment.center,
+                                                                        transform: Matrix4.identity()..rotateZ( ( frontOrBack ? 90 : -90 ) * pi / 180 ),
+                                                                        child: VideoPlayer( _videoController! )
+                                                                    ),
+                                                                );
                                                             } else {
                                                                 return const Center( child: CircularProgressIndicator.adaptive() );
                                                             }
@@ -118,8 +126,8 @@ class _CameraPageState extends State<CameraPage> {
                                                     )
                                                 )
                                             );
-                            
-                                            await _videoController.dispose();
+
+                                            await _videoController!.dispose();
                             
                                         } else {
                                             setState( () => isRecording = true );
