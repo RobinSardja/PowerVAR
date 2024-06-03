@@ -189,25 +189,30 @@ class LiftPreview extends StatefulWidget {
     State<LiftPreview> createState() => _LiftPreviewState();
 }
 
-class _LiftPreviewState extends State<LiftPreview> {
+class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin {
 
-    bool isPlaying = true;
+    late AnimationController linearProgressController;
 
     @override
     void initState() {
-    super.initState();
+        super.initState();
 
-    widget.videoController.addListener(() => setState( () => 
-        isPlaying = widget.videoController.value.isPlaying
-    ));
-  }
+        linearProgressController = AnimationController(
+            vsync: this,
+            duration: widget.videoController.value.duration,
+        )..addListener( () {
+            setState(() {});
+        });
+        linearProgressController.repeat();
+    }
 
-  @override
-  void dispose() {
-    widget.videoController.removeListener(() {});
+    @override
+    void dispose() {
+        linearProgressController.stop();
+        linearProgressController.dispose();
 
-    super.dispose();
-  }
+        super.dispose();
+    }
 
 
     @override
@@ -216,19 +221,42 @@ class _LiftPreviewState extends State<LiftPreview> {
             appBar: AppBar(
                 title: const Text( "Your lift" )
             ),
-            body: Center(
-                child: AspectRatio(
-                    aspectRatio: 1 / widget.videoController.value.aspectRatio,
-                    child: Transform(
-                        alignment: Alignment.center,
-                            transform: Matrix4.identity()..rotateZ( ( widget.frontOrBack ? 90 : -90 ) * pi / 180 ),
-                        child: VideoPlayer( widget.videoController )
+            body: Stack(
+                children: [
+                    Align(
+                        alignment: Alignment.topCenter,
+                        child: LinearProgressIndicator(
+                            value: linearProgressController.value,
+                            semanticsLabel: "Linear progress inidicator",
+                        ),
                     ),
-                ),
+                    Center(
+                        child: AspectRatio(
+                            aspectRatio: 1 / widget.videoController.value.aspectRatio,
+                            child: Transform(
+                                alignment: Alignment.center,
+                                    transform: Matrix4.identity()..rotateZ( ( widget.frontOrBack ? 90 : -90 ) * pi / 180 ),
+                                child: VideoPlayer( widget.videoController )
+                            ),
+                        ),
+                    ),
+                ] 
             ),
             floatingActionButton: FloatingActionButton(
-                onPressed: () => isPlaying ? widget.videoController.pause() : widget.videoController.play(),
-                child: Icon( isPlaying ? Icons.pause : Icons.play_arrow ),
+                onPressed: () {
+                    setState(() {
+                        if( widget.videoController.value.isPlaying ) {
+                            widget.videoController.pause();
+                            linearProgressController.stop();
+                        } else {
+                            widget.videoController.play();
+                            linearProgressController
+                                ..forward( from: linearProgressController.value )
+                                ..repeat();
+                        }
+                    });
+                },
+                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             bottomNavigationBar: NavigationBar(
