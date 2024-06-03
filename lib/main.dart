@@ -52,6 +52,11 @@ Future<void> main() async {
                     ),
                     showCloseIcon: true
                 ),
+                dropdownMenuTheme: const DropdownMenuThemeData(
+                    menuStyle: MenuStyle(
+                        backgroundColor: WidgetStatePropertyAll( Colors.white )
+                    )
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
@@ -100,6 +105,11 @@ Future<void> main() async {
                         color: Colors.black,
                     ),
                     showCloseIcon: true
+                ),
+                dropdownMenuTheme: const DropdownMenuThemeData(
+                    menuStyle: MenuStyle(
+                        backgroundColor: WidgetStatePropertyAll( Colors.black )
+                    )
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
