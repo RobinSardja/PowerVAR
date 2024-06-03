@@ -31,7 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         )
                     ),
                     ListTile(
-                        title: const Text( "Camera Quality" ),
+                        title: const Text( "Camera quality" ),
                         trailing: DropdownMenu(
                             initialSelection: resolutionPreset,
                             onSelected: (value) {

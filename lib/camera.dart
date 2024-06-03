@@ -32,7 +32,7 @@ class _CameraPageState extends State<CameraPage> {
     void initCamera() {
         _cameraController = CameraController(
         widget.cameras[ frontOrBack ? 0 : 1 ],
-        ResolutionPreset.max
+        ResolutionPreset.high
         );
 
         _initalizeControllerFuture = _cameraController.initialize();
@@ -46,7 +46,7 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     @override
-    Future<void> dispose() async {
+    void dispose() {
         _videoController?.dispose();
         _cameraController.dispose();
 
@@ -111,14 +111,12 @@ class _CameraPageState extends State<CameraPage> {
                                                         future: _initializeVideoPlayerFuture,
                                                         builder: (context, snapshot) {
                                                             if( snapshot.connectionState == ConnectionState.done ) {
-                                                                return AspectRatio(
-                                                                    aspectRatio: _videoController!.value.aspectRatio,
-                                                                    child: Transform(
-                                                                        alignment: Alignment.center,
-                                                                        transform: Matrix4.identity()..rotateZ( ( frontOrBack ? 90 : -90 ) * pi / 180 ),
-                                                                        child: VideoPlayer( _videoController! )
-                                                                    ),
+
+                                                                return LiftPreview(
+                                                                   videoController: _videoController!,
+                                                                   frontOrBack: frontOrBack,
                                                                 );
+
                                                             } else {
                                                                 return const Center( child: CircularProgressIndicator.adaptive() );
                                                             }
@@ -152,7 +150,7 @@ class _CameraPageState extends State<CameraPage> {
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
-                                                content: Text( "Cannot flip camera while recording" ),
+                                                content: Text( "Flipping locked while recording" ),
                                                 behavior: SnackBarBehavior.floating,
                                             )
                                         );
@@ -175,4 +173,85 @@ class _CameraPageState extends State<CameraPage> {
             ),
         );
 	}
+}
+
+class LiftPreview extends StatefulWidget {
+    const LiftPreview({
+        super.key,
+        required this.videoController,
+        required this.frontOrBack
+    });
+
+    final VideoPlayerController videoController;
+    final bool frontOrBack;
+
+    @override
+    State<LiftPreview> createState() => _LiftPreviewState();
+}
+
+class _LiftPreviewState extends State<LiftPreview> {
+
+    bool isPlaying = true;
+
+    @override
+    void initState() {
+    super.initState();
+
+    widget.videoController.addListener(() => setState( () => 
+        isPlaying = widget.videoController.value.isPlaying
+    ));
+  }
+
+  @override
+  void dispose() {
+    widget.videoController.removeListener(() {});
+
+    super.dispose();
+  }
+
+
+    @override
+    Widget build(BuildContext context) {
+        return Scaffold(
+            appBar: AppBar(
+                title: const Text( "Your lift" )
+            ),
+            body: Center(
+                child: AspectRatio(
+                    aspectRatio: 1 / widget.videoController.value.aspectRatio,
+                    child: Transform(
+                        alignment: Alignment.center,
+                            transform: Matrix4.identity()..rotateZ( ( widget.frontOrBack ? 90 : -90 ) * pi / 180 ),
+                        child: VideoPlayer( widget.videoController )
+                    ),
+                ),
+            ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () => isPlaying ? widget.videoController.pause() : widget.videoController.play(),
+                child: Icon( isPlaying ? Icons.pause : Icons.play_arrow ),
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            bottomNavigationBar: NavigationBar(
+                onDestinationSelected: (value) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text( value == 0 ? "Lift saved!" : "Lift discarded" ),
+                            behavior: SnackBarBehavior.floating,
+                        )
+                    );
+                },
+                destinations: const [
+                    NavigationDestination(
+                        icon: Icon( Icons.download ),
+                        label: "Save lift"
+                    ),
+                    NavigationDestination(
+                        icon: Icon( Icons.delete ),
+                        label: "Discard"
+                    )
+                ],
+            ),
+        );
+    }
 }
