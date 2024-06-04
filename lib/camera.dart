@@ -124,8 +124,6 @@ class _CameraPageState extends State<CameraPage> {
                                                     )
                                                 )
                                             );
-
-                                            await _videoController!.dispose();
                             
                                         } else {
                                             setState( () => isRecording = true );
@@ -208,12 +206,11 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
     @override
     void dispose() {
-        linearProgressController.stop();
         linearProgressController.dispose();
+        widget.videoController.dispose();
 
         super.dispose();
     }
-
 
     @override
     Widget build(BuildContext context) {
