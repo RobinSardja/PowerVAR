@@ -31,8 +31,8 @@ class _CameraPageState extends State<CameraPage> {
 
     void initCamera() {
         _cameraController = CameraController(
-        widget.cameras[ frontOrBack ? 0 : 1 ],
-        ResolutionPreset.high
+            widget.cameras[ frontOrBack ? 0 : 1 ],
+            ResolutionPreset.high,
         );
 
         _initalizeControllerFuture = _cameraController.initialize();
@@ -220,21 +220,19 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             ),
             body: Stack(
                 children: [
-                    Align(
-                        alignment: Alignment.topCenter,
-                        child: LinearProgressIndicator(
-                            value: linearProgressController.value,
-                            semanticsLabel: "Linear progress inidicator",
-                        ),
-                    ),
                     Center(
                         child: AspectRatio(
                             aspectRatio: 1 / widget.videoController.value.aspectRatio,
-                            child: Transform(
-                                alignment: Alignment.center,
-                                    transform: Matrix4.identity()..rotateZ( ( widget.frontOrBack ? 90 : -90 ) * pi / 180 ),
+                            child: Transform.rotate(
+                                angle: widget.frontOrBack ? 90 : -90  * pi / 180,
                                 child: VideoPlayer( widget.videoController )
                             ),
+                        ),
+                    ),
+                    Align(
+                        alignment: Alignment.bottomCenter,
+                        child: LinearProgressIndicator(
+                            value: linearProgressController.value,
                         ),
                     ),
                 ] 
@@ -255,7 +253,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                 },
                 child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             bottomNavigationBar: NavigationBar(
                 onDestinationSelected: (value) {
                     Navigator.pop(context);
