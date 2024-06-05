@@ -20,6 +20,11 @@ class PowerVAR extends StatefulWidget {
 
 class _PowerVARState extends State<PowerVAR> {
 
+    Map<String, dynamic> settings = {
+        "enableTracking": true,
+        "resolutionPreset": ResolutionPreset.high
+    };
+
 	// selected index for navigation bar
 	int selectedIndex = 1;
 
@@ -42,8 +47,8 @@ class _PowerVARState extends State<PowerVAR> {
                 },
                 children: [
                     const HomePage(),
-                    CameraPage( cameras: widget.cameras ),
-                    const SettingsPage()
+                    CameraPage( cameras: widget.cameras, settings: settings ),
+                    SettingsPage( settings: settings )
                 ]
             ),
             bottomNavigationBar: NavigationBar(

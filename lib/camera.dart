@@ -10,10 +10,12 @@ import "package:video_player/video_player.dart";
 class CameraPage extends StatefulWidget {
 	const CameraPage({
         super.key,
-        required this.cameras
+        required this.cameras,
+        required this.settings
     });
 
     final List<CameraDescription> cameras;
+    final Map<String, dynamic> settings;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -32,7 +34,7 @@ class _CameraPageState extends State<CameraPage> {
     void initCamera() {
         _cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
-            ResolutionPreset.high,
+            widget.settings["resolutionPreset"]
         );
 
         _initalizeControllerFuture = _cameraController.initialize();
@@ -55,6 +57,7 @@ class _CameraPageState extends State<CameraPage> {
 
 	@override
 	Widget build(BuildContext context) {
+
 		return Scaffold(
             body: Stack(
                 children: [

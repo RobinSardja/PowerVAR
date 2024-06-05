@@ -3,7 +3,12 @@ import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 
 class SettingsPage extends StatefulWidget {
-	const SettingsPage({super.key});
+	const SettingsPage({
+        super.key,
+        required this.settings
+    });
+
+    final Map<String, dynamic> settings;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -11,7 +16,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
 
-    bool enableTracking = true;
     ResolutionPreset resolutionPreset = ResolutionPreset.high;
 
 	@override
@@ -24,18 +28,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     ListTile(
                         title: const Text( "Enable tracking" ),
                         trailing: Switch(
-                            value: enableTracking,
+                            value: widget.settings["enableTracking"],
                             onChanged: (value) {
-                                setState( () => enableTracking = value );
+                                setState( () => widget.settings["enableTracking"] = value );
                             },
                         )
                     ),
                     ListTile(
                         title: const Text( "Camera quality" ),
                         trailing: DropdownMenu(
-                            initialSelection: resolutionPreset,
+                            initialSelection: widget.settings["resolutionPreset"],
                             onSelected: (value) {
-                                setState( () => resolutionPreset = value! );
+                                setState( () => widget.settings["resolutionPreset"] = value! );
                             },
                             dropdownMenuEntries: const [
                                 DropdownMenuEntry(
