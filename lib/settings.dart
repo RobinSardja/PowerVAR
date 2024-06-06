@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-import "package:camera/camera.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class SettingsPage extends StatefulWidget {
 	const SettingsPage({
@@ -8,7 +8,7 @@ class SettingsPage extends StatefulWidget {
         required this.settings
     });
 
-    final Map<String, dynamic> settings;
+    final SharedPreferences settings;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -16,7 +16,16 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
 
-    ResolutionPreset resolutionPreset = ResolutionPreset.high;
+    late bool enableTracking;
+    late int resolutionPreset;
+
+    @override
+    void initState() {
+        super.initState();
+
+        enableTracking = widget.settings.getBool("enableTracking") ?? true;
+        resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 0;
+    }
 
 	@override
 	Widget build(BuildContext context) {
@@ -28,42 +37,44 @@ class _SettingsPageState extends State<SettingsPage> {
                     ListTile(
                         title: const Text( "Enable tracking" ),
                         trailing: Switch(
-                            value: widget.settings["enableTracking"],
+                            value: enableTracking,
                             onChanged: (value) {
-                                setState( () => widget.settings["enableTracking"] = value );
-                            },
+                                setState( () => enableTracking = value );
+                                widget.settings.setBool( "enableTracking", enableTracking );
+                            }
                         )
                     ),
                     ListTile(
                         title: const Text( "Camera quality" ),
                         trailing: DropdownMenu(
-                            initialSelection: widget.settings["resolutionPreset"],
+                            initialSelection: resolutionPreset,
                             onSelected: (value) {
-                                setState( () => widget.settings["resolutionPreset"] = value! );
+                                setState( () => resolutionPreset = value! );
+                                widget.settings.setInt( "resolutionPreset", resolutionPreset );
                             },
                             dropdownMenuEntries: const [
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.low,
+                                    value: 0,
                                     label: "Low",
                                 ),
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.medium,
+                                    value: 1,
                                     label: "Medium",
                                 ),
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.high,
+                                    value: 2,
                                     label: "High",
                                 ),
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.veryHigh,
+                                    value: 3,
                                     label: "Very high",
                                 ),
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.ultraHigh,
+                                    value: 4,
                                     label: "Ultra high",
                                 ),
                                 DropdownMenuEntry(
-                                    value: ResolutionPreset.max,
+                                    value: 5,
                                     label: "Max",
                                 )
                             ],

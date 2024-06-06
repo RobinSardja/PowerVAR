@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
 import "package:camera/camera.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 import "powervar.dart";
 
@@ -9,6 +10,7 @@ Future<void> main() async {
 	WidgetsFlutterBinding.ensureInitialized();
 
     final cameras = await availableCameras();
+    final settings = await SharedPreferences.getInstance();
 
 	SystemChrome.setPreferredOrientations([
 		DeviceOrientation.portraitUp,
@@ -126,7 +128,7 @@ Future<void> main() async {
 					)
 				)
 			),
-            home: PowerVAR( cameras: cameras ),
+            home: PowerVAR( cameras: cameras, settings: settings ),
         )
     );
 }

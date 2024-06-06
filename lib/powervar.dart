@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 import "camera.dart";
 import "home.dart";
@@ -9,21 +10,18 @@ import "settings.dart";
 class PowerVAR extends StatefulWidget {
 	const PowerVAR({
         super.key,
-        required this.cameras
+        required this.cameras,
+        required this.settings
     });
 
     final List<CameraDescription> cameras;
+    final SharedPreferences settings;
 
 	@override
 	State<PowerVAR> createState() => _PowerVARState();
 }
 
 class _PowerVARState extends State<PowerVAR> {
-
-    Map<String, dynamic> settings = {
-        "enableTracking": true,
-        "resolutionPreset": ResolutionPreset.high
-    };
 
 	// selected index for navigation bar
 	int selectedIndex = 1;
@@ -47,8 +45,8 @@ class _PowerVARState extends State<PowerVAR> {
                 },
                 children: [
                     const HomePage(),
-                    CameraPage( cameras: widget.cameras, settings: settings ),
-                    SettingsPage( settings: settings )
+                    CameraPage( cameras: widget.cameras, settings: widget.settings ),
+                    SettingsPage( settings: widget.settings )
                 ]
             ),
             bottomNavigationBar: NavigationBar(

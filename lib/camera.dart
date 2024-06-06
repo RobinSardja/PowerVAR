@@ -5,6 +5,7 @@ import "dart:math";
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "package:video_player/video_player.dart";
 
 class CameraPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class CameraPage extends StatefulWidget {
     });
 
     final List<CameraDescription> cameras;
-    final Map<String, dynamic> settings;
+    final SharedPreferences settings;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -34,7 +35,7 @@ class _CameraPageState extends State<CameraPage> {
     void initCamera() {
         _cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
-            widget.settings["resolutionPreset"]
+            ResolutionPreset.values[ widget.settings.getInt( "resolutionPreset" ) ?? 0 ]
         );
 
         _initalizeControllerFuture = _cameraController.initialize();
