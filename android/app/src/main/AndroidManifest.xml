@@ -2,7 +2,8 @@
     <application
         android:label="PowerVAR"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"> <!-- Gal: For saving to album in API 29 :Gal-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -33,6 +34,10 @@
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Gal: For supporting API <= 29 :Gal-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- Gal: For supporting API <= 29 :Gal-->
 
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

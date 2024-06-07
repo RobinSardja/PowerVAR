@@ -5,6 +5,8 @@ import "dart:math";
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
+import "package:gal/gal.dart";
+import "package:path_provider/path_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:video_player/video_player.dart";
 
@@ -27,7 +29,6 @@ class _CameraPageState extends State<CameraPage> {
     late Future<void> _initalizeControllerFuture;
     VideoPlayerController? _videoController;
     Future<void>? _initializeVideoPlayerFuture;
-
 
     bool frontOrBack = false;
     bool isRecording = false;
@@ -117,8 +118,9 @@ class _CameraPageState extends State<CameraPage> {
                                                             if( snapshot.connectionState == ConnectionState.done ) {
 
                                                                 return LiftPreview(
-                                                                   videoController: _videoController!,
                                                                    frontOrBack: frontOrBack,
+                                                                   recording: recording,
+                                                                   videoController: _videoController!,
                                                                 );
 
                                                             } else {
@@ -180,12 +182,14 @@ class _CameraPageState extends State<CameraPage> {
 class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
-        required this.videoController,
-        required this.frontOrBack
+        required this.frontOrBack,
+        required this.recording,
+        required this.videoController
     });
 
-    final VideoPlayerController videoController;
     final bool frontOrBack;
+    final XFile recording;
+    final VideoPlayerController videoController;
 
     @override
     State<LiftPreview> createState() => _LiftPreviewState();
@@ -228,7 +232,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         child: AspectRatio(
                             aspectRatio: 1 / widget.videoController.value.aspectRatio,
                             child: Transform.rotate(
-                                angle: widget.frontOrBack ? 90 : -90  * pi / 180,
+                                angle: (widget.frontOrBack ? 90 : -90) * pi / 180,
                                 child: VideoPlayer( widget.videoController )
                             ),
                         ),
@@ -259,7 +263,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             bottomNavigationBar: NavigationBar(
-                onDestinationSelected: (value) {
+                onDestinationSelected: (value) async {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -267,6 +271,13 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             behavior: SnackBarBehavior.floating,
                         )
                     );
+
+                    if( value == 0 ) {
+                        final Directory tempDir = await getTemporaryDirectory();
+                        final String newFileName = "${tempDir.path}/${DateTime.now()}.mp4";
+                        final File newFile = File(widget.recording.path).renameSync(newFileName);
+                        await Gal.putVideo( newFile.path, album: "PowerVAR" );
+                    }
                 },
                 destinations: const [
                     NavigationDestination(
