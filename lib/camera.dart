@@ -25,15 +25,18 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
+    late bool frontOrBack;
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
+
     VideoPlayerController? _videoController;
     Future<void>? _initializeVideoPlayerFuture;
 
-    bool frontOrBack = false;
     bool isRecording = false;
 
     void initCamera() {
+        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
+
         _cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
             ResolutionPreset.values[ widget.settings.getInt( "resolutionPreset" ) ?? 0 ]
@@ -163,7 +166,8 @@ class _CameraPageState extends State<CameraPage> {
 
                                     try {
                                         await _cameraController.dispose();
-                                        setState(() { frontOrBack = !frontOrBack; });
+                                        setState( () => frontOrBack = !frontOrBack );
+                                        widget.settings.setBool( "frontOrBack", frontOrBack );
                                         initCamera();
                                     } catch (e) {
                                         // HANDLE ERROR
@@ -274,8 +278,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
                     if( value == 0 ) {
                         final Directory tempDir = await getTemporaryDirectory();
-                        final String newFileName = "${tempDir.path}/${DateTime.now()}.mp4";
-                        final File newFile = File(widget.recording.path).renameSync(newFileName);
+                        final File newFile = File(widget.recording.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
                         await Gal.putVideo( newFile.path, album: "PowerVAR" );
                     }
                 },
