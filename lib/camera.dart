@@ -4,6 +4,7 @@ import "dart:io";
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
+import "package:flutter/rendering.dart";
 import "package:gal/gal.dart";
 import "package:image_picker/image_picker.dart";
 import "package:path_provider/path_provider.dart";
@@ -29,8 +30,8 @@ class _CameraPageState extends State<CameraPage> {
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
 
-    late VideoPlayerController videoController;
-    late Future<void> initializeVideoPlayerFuture;
+    VideoPlayerController? videoController;
+    Future<void>? initializeVideoPlayerFuture;
 
     final imagePicker = ImagePicker();
 
@@ -49,10 +50,10 @@ class _CameraPageState extends State<CameraPage> {
 
     void initLiftPreview( XFile source, bool fromCamera ) async {
         videoController = VideoPlayerController.file( File(source.path) );
-        initializeVideoPlayerFuture = videoController.initialize();
+        initializeVideoPlayerFuture = videoController!.initialize();
 
-        await videoController.setLooping(true);
-        await videoController.play();
+        await videoController!.setLooping(true);
+        await videoController!.play();
 
         if( !mounted ) return;
 
@@ -66,7 +67,8 @@ class _CameraPageState extends State<CameraPage> {
                             return LiftPreview(
                                 fromCamera: fromCamera,
                                 source: source,
-                                videoController: videoController,
+                                settings: widget.settings,
+                                videoController: videoController!,
                             );
 
                         } else {
@@ -88,7 +90,7 @@ class _CameraPageState extends State<CameraPage> {
     @override
     void dispose() {
         _cameraController.dispose();
-        videoController.dispose();
+        videoController?.dispose();
 
         super.dispose();
     }
@@ -198,11 +200,13 @@ class LiftPreview extends StatefulWidget {
         super.key,
         required this.fromCamera,
         required this.source,
+        required this.settings,
         required this.videoController
     });
 
     final bool fromCamera;
     final XFile source;
+    final SharedPreferences settings; 
     final VideoPlayerController videoController;
 
     @override
@@ -213,9 +217,13 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
     late AnimationController linearProgressController;
 
+    late bool enableTracking;
+
     @override
     void initState() {
         super.initState();
+
+        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
 
         linearProgressController = AnimationController(
             vsync: this,
@@ -254,25 +262,43 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             value: linearProgressController.value,
                         ),
                     ),
+                    Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: FloatingActionButton(
+                                onPressed: () {
+                                    setState( () => enableTracking = !enableTracking );
+                                    widget.settings.setBool( "enableTracking", enableTracking );
+                                },
+                                child: Icon( enableTracking ? Icons.visibility : Icons.visibility_off )
+                            ),
+                        )
+                    ),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: FloatingActionButton(
+                                onPressed: () {
+                                    setState(() {
+                                        if( widget.videoController.value.isPlaying ) {
+                                            widget.videoController.pause();
+                                            linearProgressController.stop();
+                                        } else {
+                                            widget.videoController.play();
+                                            linearProgressController
+                                                ..forward( from: linearProgressController.value )
+                                                ..repeat();
+                                        }
+                                    });
+                                },
+                                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
+                            ),
+                        )
+                    ),
                 ] 
             ),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                    setState(() {
-                        if( widget.videoController.value.isPlaying ) {
-                            widget.videoController.pause();
-                            linearProgressController.stop();
-                        } else {
-                            widget.videoController.play();
-                            linearProgressController
-                                ..forward( from: linearProgressController.value )
-                                ..repeat();
-                        }
-                    });
-                },
-                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             bottomNavigationBar: widget.fromCamera ? NavigationBar(
                 onDestinationSelected: (value) async {
                     Navigator.pop(context);
