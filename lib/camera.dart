@@ -29,8 +29,8 @@ class _CameraPageState extends State<CameraPage> {
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
 
-    VideoPlayerController? _videoController;
-    Future<void>? _initializeVideoPlayerFuture;
+    late VideoPlayerController videoController;
+    late Future<void> initializeVideoPlayerFuture;
 
     final imagePicker = ImagePicker();
 
@@ -47,6 +47,37 @@ class _CameraPageState extends State<CameraPage> {
         _initalizeControllerFuture = _cameraController.initialize();
     }
 
+    void initLiftPreview( XFile source ) async {
+        videoController = VideoPlayerController.file( File(source.path) );
+        initializeVideoPlayerFuture = videoController.initialize();
+
+        await videoController.setLooping(true);
+        await videoController.play();
+
+        if( !mounted ) return;
+
+        await Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) => FutureBuilder(
+                    future: initializeVideoPlayerFuture,
+                    builder: (context, snapshot) {
+                        if( snapshot.connectionState == ConnectionState.done ) {
+
+                            return LiftPreview(
+                                frontOrBack: frontOrBack,
+                                recording: source,
+                                videoController: videoController,
+                            );
+
+                        } else {
+                            return const Center( child: CircularProgressIndicator.adaptive() );
+                        }
+                    }
+                )
+            )
+        );
+    }
+
     @override
     void initState() {
         super.initState();
@@ -56,8 +87,8 @@ class _CameraPageState extends State<CameraPage> {
 
     @override
     void dispose() {
-        _videoController?.dispose();
         _cameraController.dispose();
+        videoController.dispose();
 
         super.dispose();
     }
@@ -91,34 +122,7 @@ class _CameraPageState extends State<CameraPage> {
 
                                         if( galleryVideo == null ) return;
 
-                                        _videoController = VideoPlayerController.file( File(galleryVideo.path) );
-                                        _initializeVideoPlayerFuture = _videoController!.initialize();
-
-                                        await _videoController!.setLooping(true);
-                                        await _videoController!.play();
-                        
-                                        if( !context.mounted ) return;
-                        
-                                        await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) => FutureBuilder(
-                                                    future: _initializeVideoPlayerFuture,
-                                                    builder: (context, snapshot) {
-                                                        if( snapshot.connectionState == ConnectionState.done ) {
-
-                                                            return LiftPreview(
-                                                                frontOrBack: frontOrBack,
-                                                                recording: galleryVideo,
-                                                                videoController: _videoController!,
-                                                            );
-
-                                                        } else {
-                                                            return const Center( child: CircularProgressIndicator.adaptive() );
-                                                        }
-                                                    }
-                                                )
-                                            )
-                                        );
+                                        initLiftPreview( galleryVideo );
                                     } catch (e) {
                                         // HANDLE ERROR
                                     }
@@ -138,35 +142,8 @@ class _CameraPageState extends State<CameraPage> {
                                             setState( () => isRecording = false );
                             
                                             final recording = await _cameraController.stopVideoRecording();
-                                            _videoController = VideoPlayerController.file( File(recording.path) );
-                                            _initializeVideoPlayerFuture = _videoController!.initialize();
 
-                                            await _videoController!.setLooping(true);
-                                            await _videoController!.play();
-                            
-                                            if( !context.mounted ) return;
-                            
-                                            await Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) => FutureBuilder(
-                                                        future: _initializeVideoPlayerFuture,
-                                                        builder: (context, snapshot) {
-                                                            if( snapshot.connectionState == ConnectionState.done ) {
-
-                                                                return LiftPreview(
-                                                                   frontOrBack: frontOrBack,
-                                                                   recording: recording,
-                                                                   videoController: _videoController!,
-                                                                );
-
-                                                            } else {
-                                                                return const Center( child: CircularProgressIndicator.adaptive() );
-                                                            }
-                                                        }
-                                                    )
-                                                )
-                                            );
-                            
+                                            initLiftPreview( recording );
                                         } else {
                                             setState( () => isRecording = true );
                             
@@ -210,7 +187,7 @@ class _CameraPageState extends State<CameraPage> {
                             ),
                         )
                     )
-            ] 
+                ] 
             ),
         );
 	}
