@@ -6,6 +6,7 @@ import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
 import "package:gal/gal.dart";
+import "package:image_picker/image_picker.dart";
 import "package:path_provider/path_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:video_player/video_player.dart";
@@ -31,6 +32,8 @@ class _CameraPageState extends State<CameraPage> {
 
     VideoPlayerController? _videoController;
     Future<void>? _initializeVideoPlayerFuture;
+
+    final imagePicker = ImagePicker();
 
     bool isRecording = false;
 
@@ -85,7 +88,38 @@ class _CameraPageState extends State<CameraPage> {
                             child: FloatingActionButton(
                                 onPressed: () async {
                                     try {
-                            
+                                        final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
+
+                                        if( galleryVideo == null ) return;
+
+                                        _videoController = VideoPlayerController.file( File(galleryVideo.path) );
+                                        _initializeVideoPlayerFuture = _videoController!.initialize();
+
+                                        await _videoController!.setLooping(true);
+                                        await _videoController!.play();
+                        
+                                        if( !context.mounted ) return;
+                        
+                                        await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) => FutureBuilder(
+                                                    future: _initializeVideoPlayerFuture,
+                                                    builder: (context, snapshot) {
+                                                        if( snapshot.connectionState == ConnectionState.done ) {
+
+                                                            return LiftPreview(
+                                                                frontOrBack: frontOrBack,
+                                                                recording: galleryVideo,
+                                                                videoController: _videoController!,
+                                                            );
+
+                                                        } else {
+                                                            return const Center( child: CircularProgressIndicator.adaptive() );
+                                                        }
+                                                    }
+                                                )
+                                            )
+                                        );
                                     } catch (e) {
                                         // HANDLE ERROR
                                     }
