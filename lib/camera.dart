@@ -1,6 +1,5 @@
 import "dart:async";
 import "dart:io";
-import "dart:math";
 
 import "package:flutter/material.dart";
 
@@ -268,11 +267,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                 children: [
                     Center(
                         child: AspectRatio(
-                            aspectRatio: 1 / widget.videoController.value.aspectRatio,
-                            child: Transform.rotate(
-                                angle: (widget.frontOrBack ? 90 : -90) * pi / 180,
-                                child: VideoPlayer( widget.videoController )
-                            ),
+                            aspectRatio: widget.videoController.value.aspectRatio,
+                            child: VideoPlayer( widget.videoController )
                         ),
                     ),
                     Align(
