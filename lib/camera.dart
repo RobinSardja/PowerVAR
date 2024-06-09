@@ -47,7 +47,7 @@ class _CameraPageState extends State<CameraPage> {
         _initalizeControllerFuture = _cameraController.initialize();
     }
 
-    void initLiftPreview( XFile source ) async {
+    void initLiftPreview( XFile source, bool fromCamera ) async {
         videoController = VideoPlayerController.file( File(source.path) );
         initializeVideoPlayerFuture = videoController.initialize();
 
@@ -64,8 +64,8 @@ class _CameraPageState extends State<CameraPage> {
                         if( snapshot.connectionState == ConnectionState.done ) {
 
                             return LiftPreview(
-                                frontOrBack: frontOrBack,
-                                recording: source,
+                                fromCamera: fromCamera,
+                                source: source,
                                 videoController: videoController,
                             );
 
@@ -122,7 +122,7 @@ class _CameraPageState extends State<CameraPage> {
 
                                         if( galleryVideo == null ) return;
 
-                                        initLiftPreview( galleryVideo );
+                                        initLiftPreview( galleryVideo, false );
                                     } catch (e) {
                                         // HANDLE ERROR
                                     }
@@ -143,7 +143,7 @@ class _CameraPageState extends State<CameraPage> {
                             
                                             final recording = await _cameraController.stopVideoRecording();
 
-                                            initLiftPreview( recording );
+                                            initLiftPreview( recording, true );
                                         } else {
                                             setState( () => isRecording = true );
                             
@@ -196,13 +196,13 @@ class _CameraPageState extends State<CameraPage> {
 class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
-        required this.frontOrBack,
-        required this.recording,
+        required this.fromCamera,
+        required this.source,
         required this.videoController
     });
 
-    final bool frontOrBack;
-    final XFile recording;
+    final bool fromCamera;
+    final XFile source;
     final VideoPlayerController videoController;
 
     @override
@@ -273,7 +273,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                 child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-            bottomNavigationBar: NavigationBar(
+            bottomNavigationBar: widget.fromCamera ? NavigationBar(
                 onDestinationSelected: (value) async {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -285,7 +285,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
                     if( value == 0 ) {
                         final Directory tempDir = await getTemporaryDirectory();
-                        final File newFile = File(widget.recording.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
+                        final File newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
                         await Gal.putVideo( newFile.path, album: "PowerVAR" );
                     }
                 },
@@ -299,7 +299,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         label: "Discard"
                     )
                 ],
-            ),
+            ) : const BottomAppBar(),
         );
     }
 }

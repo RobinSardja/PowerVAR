@@ -59,6 +59,9 @@ Future<void> main() async {
                         backgroundColor: WidgetStatePropertyAll( Colors.white )
                     )
                 ),
+                bottomAppBarTheme: const BottomAppBarTheme(
+                    color: Colors.red,
+                ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
@@ -112,6 +115,9 @@ Future<void> main() async {
                     menuStyle: MenuStyle(
                         backgroundColor: WidgetStatePropertyAll( Colors.black )
                     )
+                ),
+                bottomAppBarTheme: const BottomAppBarTheme(
+                    color: Colors.black,
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
