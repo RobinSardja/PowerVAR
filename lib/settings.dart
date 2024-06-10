@@ -17,6 +17,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
 
     late bool enableTracking;
+    late bool hyperAccuracy;
+    late bool generateAdvice;
     late int resolutionPreset;
 
     @override
@@ -24,6 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
         super.initState();
 
         enableTracking = widget.settings.getBool("enableTracking") ?? true;
+        hyperAccuracy = widget.settings.getBool("hyperAccuracy") ?? true;
+        generateAdvice = widget.settings.getBool("generateAdvice") ?? true;
         resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 0;
     }
 
@@ -41,6 +45,27 @@ class _SettingsPageState extends State<SettingsPage> {
                             onChanged: (value) {
                                 setState( () => enableTracking = value );
                                 widget.settings.setBool( "enableTracking", enableTracking );
+                            }
+                        )
+                    ),
+                    ListTile(
+                        title: const Text( "Hyper accuracy *" ),
+                        trailing: Switch(
+                            value: hyperAccuracy,
+                            onChanged: (value) {
+                                setState( () => hyperAccuracy = value );
+                                widget.settings.setBool( "hyperAccuracy", hyperAccuracy );
+                            }
+                        )
+                    ),
+                    const Center( child: Text( "* Recommended only for newer phones" ) ),
+                    ListTile(
+                        title: const Text( "Generate advice" ),
+                        trailing: Switch(
+                            value: generateAdvice,
+                            onChanged: (value) {
+                                setState( () => generateAdvice = value );
+                                widget.settings.setBool( "generateAdvice", generateAdvice );
                             }
                         )
                     ),
@@ -78,7 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     label: "Max",
                                 )
                             ],
-                      ),
+                        ),
                     )
                 ]
             ),
