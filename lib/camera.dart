@@ -110,7 +110,7 @@ class _CameraPageState extends State<CameraPage> {
                                     return const Center( child: CircularProgressIndicator.adaptive() );
                                 }
                             }
-                        ),
+                        )
                     ),
                     Align(
                         alignment: Alignment.bottomLeft,
@@ -129,7 +129,7 @@ class _CameraPageState extends State<CameraPage> {
                                     }
                                 },
                                 child: const Icon( Icons.photo )
-                            ),
+                            )
                         )
                     ),
                     Align(
@@ -156,8 +156,8 @@ class _CameraPageState extends State<CameraPage> {
                                     }
                                 },
                                 child: Icon( isRecording ? Icons.check : Icons.videocam )
-                            ),
-                        ),
+                            )
+                        )
                     ),
                     Align(
                         alignment: Alignment.bottomRight,
@@ -185,11 +185,11 @@ class _CameraPageState extends State<CameraPage> {
                                     }
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
-                            ),
+                            )
                         )
                     )
                 ] 
-            ),
+            )
         );
 	}
 }
@@ -271,7 +271,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                     widget.settings.setBool( "enableTracking", enableTracking );
                                 },
                                 child: Icon( enableTracking ? Icons.visibility : Icons.visibility_off )
-                            ),
+                            )
                         )
                     ),
                     Align(
@@ -293,9 +293,9 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                     });
                                 },
                                 child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
-                            ),
+                            )
                         )
-                    ),
+                    )
                 ] 
             ),
             bottomNavigationBar: widget.fromCamera ? NavigationBar(

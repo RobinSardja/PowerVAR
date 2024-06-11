@@ -134,7 +134,7 @@ Future<void> main() async {
 					)
 				)
 			),
-            home: PowerVAR( cameras: cameras, settings: settings ),
+            home: PowerVAR( cameras: cameras, settings: settings )
         )
     );
 }

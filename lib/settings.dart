@@ -60,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const Center( child: Text( "* Recommended only for newer phones" ) ),
                     ListTile(
-                        title: const Text( "Generate advice" ),
+                        title: const Text( "Generate advice (coming soon!)" ),
                         trailing: Switch(
                             value: generateAdvice,
                             onChanged: (value) {
@@ -102,11 +102,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                     value: 5,
                                     label: "Max",
                                 )
-                            ],
-                        ),
+                            ]
+                        )
                     )
                 ]
-            ),
+            )
         );
 	}
 }

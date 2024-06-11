@@ -41,7 +41,7 @@ class _PowerVARState extends State<PowerVAR> {
             body: PageView(
                 controller: pageController,
                 onPageChanged: (selectedPage) {
-                    setState(() {selectedIndex = selectedPage;});
+                    setState( () => selectedIndex = selectedPage );
                 },
                 children: [
                     const HomePage(),
@@ -69,9 +69,9 @@ class _PowerVARState extends State<PowerVAR> {
                     NavigationDestination(
                         icon: Icon( Icons.settings ),
                         label: "Settings",
-                    ),
-                ],
-            ),
+                    )
+                ]
+            )
 		);
 	}
 }
