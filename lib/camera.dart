@@ -3,6 +3,8 @@ import "dart:io";
 
 import "package:flutter/material.dart";
 
+import "package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart";
+
 import "package:camera/camera.dart";
 import "package:gal/gal.dart";
 import "package:image_picker/image_picker.dart";
