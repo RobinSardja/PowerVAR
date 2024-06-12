@@ -34,9 +34,19 @@ class _CameraPageState extends State<CameraPage> {
     VideoPlayerController? videoController;
     Future<void>? initializeVideoPlayerFuture;
 
+    PoseDetector? poseDetector;
+
     final imagePicker = ImagePicker();
 
     bool isRecording = false;
+
+    void initPoseDetector() {
+        poseDetector = PoseDetector(
+            options: PoseDetectorOptions(
+                model: widget.settings.getBool( "hyperAccuracy" ) ?? false ? PoseDetectionModel.accurate : PoseDetectionModel.base,
+            )
+        );
+    }
 
     void initCamera() {
         frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
@@ -92,6 +102,7 @@ class _CameraPageState extends State<CameraPage> {
     void dispose() {
         _cameraController.dispose();
         videoController?.dispose();
+        poseDetector?.close();
 
         super.dispose();
     }
@@ -120,6 +131,16 @@ class _CameraPageState extends State<CameraPage> {
                             padding: const EdgeInsets.all(16.0),
                             child: FloatingActionButton(
                                 onPressed: () async {
+                                    if( isRecording ) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text( "Gallery locked while recording" ),
+                                                behavior: SnackBarBehavior.floating,
+                                            )
+                                        );
+                                        return;
+                                    }
+
                                     try {
                                         final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
 
