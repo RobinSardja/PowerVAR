@@ -36,7 +36,7 @@ class _PowerVARState extends State<PowerVAR> {
 
 		return Scaffold(
             appBar: AppBar(
-                title: const Text( "PowerVAR" ),
+                title: const Text( "PowerVAR" )
             ),
             body: PageView(
                 controller: pageController,
@@ -60,15 +60,15 @@ class _PowerVARState extends State<PowerVAR> {
                 destinations: const [
                     NavigationDestination(
                         icon: Icon( Icons.home ),
-                        label: "Home",
+                        label: "Home"
                     ),
                     NavigationDestination(
                         icon: Icon( Icons.camera_alt ),
-                        label: "Camera",
+                        label: "Camera"
                     ),
                     NavigationDestination(
                         icon: Icon( Icons.settings ),
-                        label: "Settings",
+                        label: "Settings"
                     )
                 ]
             )

@@ -24,7 +24,7 @@ Future<void> main() async {
 				appBarTheme: const AppBarTheme(
 					centerTitle: true,
 					backgroundColor: Colors.red,
-					foregroundColor: Colors.white,
+					foregroundColor: Colors.white
 				),
 				scaffoldBackgroundColor: Colors.white,
                 floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -32,7 +32,7 @@ Future<void> main() async {
                     foregroundColor: Colors.white
                 ),
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
-                    color: Colors.red,
+                    color: Colors.red
                 ),
                 switchTheme: SwitchThemeData(
                     thumbColor:  WidgetStateProperty.resolveWith((state) {
@@ -43,14 +43,14 @@ Future<void> main() async {
 					}),
                     trackOutlineColor: WidgetStateProperty.resolveWith((state) {
 						return state.contains( WidgetState.selected ) ? Colors.red : Colors.black;
-					}),
+					})
                 ),
                 snackBarTheme: const SnackBarThemeData(
                     backgroundColor: Colors.white,
                     actionTextColor: Colors.black,
                     closeIconColor: Colors.red,
                     contentTextStyle: TextStyle(
-                        color: Colors.black,
+                        color: Colors.black
                     ),
                     showCloseIcon: true
                 ),
@@ -60,7 +60,7 @@ Future<void> main() async {
                     )
                 ),
                 bottomAppBarTheme: const BottomAppBarTheme(
-                    color: Colors.red,
+                    color: Colors.red
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
@@ -81,12 +81,12 @@ Future<void> main() async {
 				appBarTheme: const AppBarTheme(
 					centerTitle: true,
 					backgroundColor: Colors.black,
-					foregroundColor: Colors.white,
+					foregroundColor: Colors.white
 				),
 				scaffoldBackgroundColor: Colors.black,
                 floatingActionButtonTheme: const FloatingActionButtonThemeData(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    foregroundColor: Colors.black
                 ),
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
                     color: Colors.white
@@ -107,7 +107,7 @@ Future<void> main() async {
                     actionTextColor: Colors.black,
                     closeIconColor: Colors.black,
                     contentTextStyle: TextStyle(
-                        color: Colors.black,
+                        color: Colors.black
                     ),
                     showCloseIcon: true
                 ),
@@ -117,7 +117,7 @@ Future<void> main() async {
                     )
                 ),
                 bottomAppBarTheme: const BottomAppBarTheme(
-                    color: Colors.black,
+                    color: Colors.black
                 ),
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,

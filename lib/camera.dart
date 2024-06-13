@@ -79,7 +79,7 @@ class _CameraPageState extends State<CameraPage> {
                                 fromCamera: fromCamera,
                                 source: source,
                                 settings: widget.settings,
-                                videoController: videoController!,
+                                videoController: videoController!
                             );
 
                         } else {
@@ -135,7 +135,7 @@ class _CameraPageState extends State<CameraPage> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
                                                 content: Text( "Gallery locked while recording" ),
-                                                behavior: SnackBarBehavior.floating,
+                                                behavior: SnackBarBehavior.floating
                                             )
                                         );
                                         return;
@@ -192,19 +192,18 @@ class _CameraPageState extends State<CameraPage> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
                                                 content: Text( "Flipping locked while recording" ),
-                                                behavior: SnackBarBehavior.floating,
+                                                behavior: SnackBarBehavior.floating
                                             )
                                         );
-                                        return;
-                                    }
-
-                                    try {
-                                        await _cameraController.dispose();
-                                        setState( () => frontOrBack = !frontOrBack );
-                                        widget.settings.setBool( "frontOrBack", frontOrBack );
-                                        initCamera();
-                                    } catch (e) {
-                                        // HANDLE ERROR
+                                    } else {
+                                        try {
+                                            await _cameraController.dispose();
+                                            setState( () => frontOrBack = !frontOrBack );
+                                            widget.settings.setBool( "frontOrBack", frontOrBack );
+                                            initCamera();
+                                        } catch (e) {
+                                            // HANDLE ERROR
+                                        }
                                     }
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
@@ -249,7 +248,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
         linearProgressController = AnimationController(
             vsync: this,
-            duration: widget.videoController.value.duration,
+            duration: widget.videoController.value.duration
         )..addListener( () {
             setState(() {});
         });
@@ -276,13 +275,13 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         child: AspectRatio(
                             aspectRatio: widget.videoController.value.aspectRatio,
                             child: VideoPlayer( widget.videoController )
-                        ),
+                        )
                     ),
                     Align(
                         alignment: Alignment.bottomCenter,
                         child: LinearProgressIndicator(
-                            value: linearProgressController.value,
-                        ),
+                            value: linearProgressController.value
+                        )
                     ),
                     Align(
                         alignment: Alignment.bottomLeft,
@@ -346,8 +345,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         icon: Icon( Icons.delete ),
                         label: "Discard"
                     )
-                ],
-            ) : const BottomAppBar(),
+                ]
+            ) : const BottomAppBar()
         );
     }
 }

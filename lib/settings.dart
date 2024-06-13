@@ -80,27 +80,27 @@ class _SettingsPageState extends State<SettingsPage> {
                             dropdownMenuEntries: const [
                                 DropdownMenuEntry(
                                     value: 0,
-                                    label: "Low",
+                                    label: "Low"
                                 ),
                                 DropdownMenuEntry(
                                     value: 1,
-                                    label: "Medium",
+                                    label: "Medium"
                                 ),
                                 DropdownMenuEntry(
                                     value: 2,
-                                    label: "High",
+                                    label: "High"
                                 ),
                                 DropdownMenuEntry(
                                     value: 3,
-                                    label: "Very high",
+                                    label: "Very high"
                                 ),
                                 DropdownMenuEntry(
                                     value: 4,
-                                    label: "Ultra high",
+                                    label: "Ultra high"
                                 ),
                                 DropdownMenuEntry(
                                     value: 5,
-                                    label: "Max",
+                                    label: "Max"
                                 )
                             ]
                         )
