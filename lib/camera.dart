@@ -117,11 +117,9 @@ class _CameraPageState extends State<CameraPage> {
                         child: FutureBuilder<void>(
                             future: _initalizeControllerFuture,
                             builder: (context, snapshot) {
-                                if( snapshot.connectionState == ConnectionState.done ) {
-                                    return CameraPreview(_cameraController);
-                                } else {
-                                    return const Center( child: CircularProgressIndicator.adaptive() );
-                                }
+                                return snapshot.connectionState == ConnectionState.done ?
+                                CameraPreview(_cameraController) :
+                                const Center( child: CircularProgressIndicator.adaptive() );
                             }
                         )
                     ),
@@ -138,17 +136,14 @@ class _CameraPageState extends State<CameraPage> {
                                                 behavior: SnackBarBehavior.floating
                                             )
                                         );
-                                        return;
-                                    }
+                                    } else {
+                                        try {
+                                            final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
 
-                                    try {
-                                        final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
-
-                                        if( galleryVideo == null ) return;
-
-                                        initLiftPreview( galleryVideo, false );
-                                    } catch (e) {
-                                        // HANDLE ERROR
+                                            if( galleryVideo != null ) initLiftPreview( galleryVideo, false );
+                                        } catch (e) {
+                                            // HANDLE ERROR
+                                        }
                                     }
                                 },
                                 child: const Icon( Icons.photo )

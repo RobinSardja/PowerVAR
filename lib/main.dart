@@ -12,10 +12,7 @@ Future<void> main() async {
     final cameras = await availableCameras();
     final settings = await SharedPreferences.getInstance();
 
-	SystemChrome.setPreferredOrientations([
-		DeviceOrientation.portraitUp,
-		DeviceOrientation.portraitDown
-	]);
+	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
 	runApp(
         MaterialApp(
