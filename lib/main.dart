@@ -12,8 +12,11 @@ Future<void> main() async {
 
     final cameras = await availableCameras();
     final settings = await SharedPreferences.getInstance();
-    final perms = [ Permission.camera, Permission.microphone, Permission.mediaLibrary ];
-    Map<Permission, PermissionStatus> statuses = await perms.request();
+    final perms = await [
+        Permission.camera,
+        Permission.microphone,
+        Permission.mediaLibrary
+    ].request();
 
 	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -134,19 +137,7 @@ Future<void> main() async {
 					)
 				)
 			),
-            home: statuses[Permission.camera] == PermissionStatus.granted &&
-            statuses[Permission.microphone] == PermissionStatus.granted &&
-            statuses[Permission.mediaLibrary] == PermissionStatus.granted ?
-            PowerVAR( cameras: cameras, settings: settings ) :
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                    ElevatedButton(
-                        onPressed: statuses.containsValue(PermissionStatus.permanentlyDenied) ? openAppSettings : () async => statuses = await perms.request(),
-                        child: const Text( "Open app settings and grant permissions" )
-                    ),
-                ],
-            )
+            home: PowerVAR( cameras: cameras, settings: settings )
         )
     );
 }
