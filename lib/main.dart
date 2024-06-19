@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
 import "package:camera/camera.dart";
+import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "powervar.dart";
@@ -11,6 +12,8 @@ Future<void> main() async {
 
     final cameras = await availableCameras();
     final settings = await SharedPreferences.getInstance();
+    final perms = [ Permission.camera, Permission.microphone, Permission.mediaLibrary ];
+    Map<Permission, PermissionStatus> statuses = await perms.request();
 
 	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -131,7 +134,19 @@ Future<void> main() async {
 					)
 				)
 			),
-            home: PowerVAR( cameras: cameras, settings: settings )
+            home: statuses[Permission.camera] == PermissionStatus.granted &&
+            statuses[Permission.microphone] == PermissionStatus.granted &&
+            statuses[Permission.mediaLibrary] == PermissionStatus.granted ?
+            PowerVAR( cameras: cameras, settings: settings ) :
+            Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    ElevatedButton(
+                        onPressed: statuses.containsValue(PermissionStatus.permanentlyDenied) ? openAppSettings : () async => statuses = await perms.request(),
+                        child: const Text( "Open app settings and grant permissions" )
+                    ),
+                ],
+            )
         )
     );
 }

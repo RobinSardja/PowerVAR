@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
-import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "camera.dart";
@@ -27,21 +26,6 @@ class _PowerVARState extends State<PowerVAR> {
 	// selected index for navigation bar
 	int selectedIndex = 1;
 
-    void reqPerms() async {
-        Map<Permission, PermissionStatus> statuses = await [
-            Permission.camera,
-            Permission.microphone,
-            Permission.mediaLibrary
-        ].request();
-    }
-
-    @override
-    void initState() {
-        super.initState();
-
-        reqPerms();
-    }
-
 	@override
 	Widget build(BuildContext context) {
 
@@ -50,7 +34,7 @@ class _PowerVARState extends State<PowerVAR> {
 			initialPage: selectedIndex,
 		);
 
-		return 1 == 1 ? Scaffold(
+		return Scaffold(
             appBar: AppBar(
                 title: const Text( "PowerVAR" )
             ),
@@ -88,12 +72,6 @@ class _PowerVARState extends State<PowerVAR> {
                     )
                 ]
             )
-		) : const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-                Text( "LMAO" ),
-                Text( "ROFL" )
-            ]
-        );
+		);
 	}
 }
