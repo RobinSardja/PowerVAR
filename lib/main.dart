@@ -18,6 +18,10 @@ Future<void> main() async {
         Permission.mediaLibrary
     ].request();
 
+    if( perms.values.every( (value) => value == PermissionStatus.granted ) ) {
+
+    }
+
 	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
 	runApp(
