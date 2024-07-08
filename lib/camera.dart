@@ -28,12 +28,14 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> {
     late bool frontOrBack;
+    late int resolutionPreset;
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
 
     VideoPlayerController? videoController;
     Future<void>? initializeVideoPlayerFuture;
 
+    late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
 
     final imagePicker = ImagePicker();
@@ -43,17 +45,15 @@ class _CameraPageState extends State<CameraPage> {
     void initPoseDetector() {
         poseDetector = PoseDetector(
             options: PoseDetectorOptions(
-                model: widget.settings.getBool( "hyperAccuracy" ) ?? false ? PoseDetectionModel.accurate : PoseDetectionModel.base,
+                model: poseModel,
             )
         );
     }
 
     void initCamera() {
-        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
-
         _cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
-            ResolutionPreset.values[ widget.settings.getInt( "resolutionPreset" ) ?? 0 ]
+            ResolutionPreset.values[ resolutionPreset ]
         );
 
         _initalizeControllerFuture = _cameraController.initialize();
@@ -95,6 +95,10 @@ class _CameraPageState extends State<CameraPage> {
     void initState() {
         super.initState();
 
+        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
+        poseModel = widget.settings.getBool( "hyperAccuracy" ) ?? false ? PoseDetectionModel.accurate : PoseDetectionModel.base;
+        resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? 0;
+
         initCamera();
     }
 
@@ -103,6 +107,8 @@ class _CameraPageState extends State<CameraPage> {
         _cameraController.dispose();
         videoController?.dispose();
         poseDetector?.close();
+
+        widget.settings.setBool( "frontOrBack", frontOrBack );
 
         super.dispose();
     }
@@ -194,7 +200,6 @@ class _CameraPageState extends State<CameraPage> {
                                         try {
                                             await _cameraController.dispose();
                                             setState( () => frontOrBack = !frontOrBack );
-                                            widget.settings.setBool( "frontOrBack", frontOrBack );
                                             initCamera();
                                         } catch (e) {
                                             // HANDLE ERROR
@@ -255,6 +260,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         linearProgressController.dispose();
         widget.videoController.dispose();
 
+        widget.settings.setBool( "enableTracking", enableTracking );
+
         super.dispose();
     }
 
@@ -285,7 +292,6 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             child: FloatingActionButton(
                                 onPressed: () {
                                     setState( () => enableTracking = !enableTracking );
-                                    widget.settings.setBool( "enableTracking", enableTracking );
                                 },
                                 child: Icon( enableTracking ? Icons.visibility : Icons.visibility_off )
                             )

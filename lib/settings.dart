@@ -31,6 +31,16 @@ class _SettingsPageState extends State<SettingsPage> {
         resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 0;
     }
 
+    @override
+    void dispose() {
+        widget.settings.setBool( "enableTracking", enableTracking );
+        widget.settings.setBool( "hyperAccuracy", hyperAccuracy );
+        widget.settings.setBool( "generateAdvice", generateAdvice );
+        widget.settings.setInt( "resolutionPreset", resolutionPreset );
+
+        super.dispose();
+    }
+
 	@override
 	Widget build(BuildContext context) {
 
@@ -44,7 +54,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             value: enableTracking,
                             onChanged: (value) {
                                 setState( () => enableTracking = value );
-                                widget.settings.setBool( "enableTracking", enableTracking );
                             }
                         )
                     ),
@@ -54,7 +63,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             value: hyperAccuracy,
                             onChanged: (value) {
                                 setState( () => hyperAccuracy = value );
-                                widget.settings.setBool( "hyperAccuracy", hyperAccuracy );
                             }
                         )
                     ),
@@ -65,7 +73,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             value: generateAdvice,
                             onChanged: (value) {
                                 setState( () => generateAdvice = value );
-                                widget.settings.setBool( "generateAdvice", generateAdvice );
                             }
                         )
                     ),
@@ -75,7 +82,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             initialSelection: resolutionPreset,
                             onSelected: (value) {
                                 setState( () => resolutionPreset = value! );
-                                widget.settings.setInt( "resolutionPreset", resolutionPreset );
                             },
                             dropdownMenuEntries: const [
                                 DropdownMenuEntry(
