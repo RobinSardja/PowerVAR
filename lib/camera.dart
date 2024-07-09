@@ -10,6 +10,7 @@ import "package:gal/gal.dart";
 import "package:image_picker/image_picker.dart";
 import "package:path_provider/path_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
+import "package:share_plus/share_plus.dart";
 import "package:video_player/video_player.dart";
 
 class CameraPage extends StatefulWidget {
@@ -323,10 +324,21 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             ),
             bottomNavigationBar: widget.fromCamera ? NavigationBar(
                 onDestinationSelected: (value) async {
+                    late String content;
+
+                    switch(value) {
+                        case 0:
+                            content = "Lift saved!";
+                        case 1:
+                            content = "Lift shared!";
+                        case 2:
+                            content = "Lift discared";
+                    }
+
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content: Text( value == 0 ? "Lift saved!" : "Lift discarded" ),
+                            content: Text( content ),
                             behavior: SnackBarBehavior.floating,
                         )
                     );
@@ -335,12 +347,21 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         final Directory tempDir = await getTemporaryDirectory();
                         final File newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
                         await Gal.putVideo( newFile.path, album: "PowerVAR" );
+                    } else {
+                        final Directory tempDir = await getTemporaryDirectory();
+                        final File newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
+                        final XFile finalFile = XFile(newFile.path);
+                        await Share.shareXFiles( [finalFile] );
                     }
                 },
                 destinations: const [
                     NavigationDestination(
                         icon: Icon( Icons.download ),
                         label: "Save lift"
+                    ),
+                    NavigationDestination(
+                        icon: Icon( Icons.share ),
+                        label: "Share lift"
                     ),
                     NavigationDestination(
                         icon: Icon( Icons.delete ),
