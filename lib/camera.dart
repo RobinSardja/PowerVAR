@@ -241,6 +241,23 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
     late bool enableTracking;
 
+    bool renamedFiles = false;
+    bool saved = false;
+
+    late Directory tempDir;
+    late File newFile;
+    late XFile finalFile;
+
+    void simpleSnackBar( String content ) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text( content ),
+                behavior: SnackBarBehavior.floating,
+                showCloseIcon: true
+            )
+        );
+    }
+
     @override
     void initState() {
         super.initState();
@@ -324,48 +341,52 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             ),
             bottomNavigationBar: widget.fromCamera ? NavigationBar(
                 onDestinationSelected: (value) async {
-                    late String content;
+                    if( !renamedFiles ) {
+                        tempDir = await getTemporaryDirectory();
+                        newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
+                        finalFile = XFile(newFile.path);
+                        setState( () => renamedFiles = true );
+                    }
 
                     switch(value) {
                         case 0:
-                            content = "Lift saved!";
+                            if( saved ) {
+                                simpleSnackBar( "Lift already saved!" );
+                            } else {
+                                await Gal.putVideo( newFile.path, album: "PowerVAR" );
+
+                                simpleSnackBar( "Lift saved!" );
+                                setState( () => saved = true );
+                            }
+                            break;
                         case 1:
-                            content = "Lift shared!";
+                            final result = await Share.shareXFiles( [finalFile] );
+
+                            if( result.status == ShareResultStatus.success ) {
+                                simpleSnackBar( "Lift shared!" );
+                            }
+                            break;
                         case 2:
-                            content = "Lift discared";
-                    }
+                            if( !saved ) {
+                                simpleSnackBar( "Lift discarded" );
+                            }
 
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text( content ),
-                            behavior: SnackBarBehavior.floating,
-                        )
-                    );
-
-                    if( value == 0 ) {
-                        final Directory tempDir = await getTemporaryDirectory();
-                        final File newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
-                        await Gal.putVideo( newFile.path, album: "PowerVAR" );
-                    } else {
-                        final Directory tempDir = await getTemporaryDirectory();
-                        final File newFile = File(widget.source.path).renameSync("${tempDir.path}/${DateTime.now()}.mp4");
-                        final XFile finalFile = XFile(newFile.path);
-                        await Share.shareXFiles( [finalFile] );
+                            if( !context.mounted ) return;
+                            Navigator.pop(context);
                     }
                 },
-                destinations: const [
-                    NavigationDestination(
+                destinations: [
+                    const NavigationDestination(
                         icon: Icon( Icons.download ),
                         label: "Save lift"
                     ),
-                    NavigationDestination(
+                    const NavigationDestination(
                         icon: Icon( Icons.share ),
                         label: "Share lift"
                     ),
                     NavigationDestination(
-                        icon: Icon( Icons.delete ),
-                        label: "Discard"
+                        icon: Icon( saved ? Icons.keyboard_return : Icons.delete ),
+                        label: saved ? "Exit" : "Discard"
                     )
                 ]
             ) : const BottomAppBar()
