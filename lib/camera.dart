@@ -339,7 +339,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                     )
                 ] 
             ),
-            bottomNavigationBar: widget.fromCamera ? NavigationBar(
+            bottomNavigationBar: NavigationBar(
                 onDestinationSelected: (value) async {
                     if( !renamedFiles ) {
                         tempDir = await getTemporaryDirectory();
@@ -350,7 +350,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
                     switch(value) {
                         case 0:
-                            if( saved ) {
+                            if( saved || !widget.fromCamera ) {
                                 simpleSnackBar( "Lift already saved!" );
                             } else {
                                 await Gal.putVideo( newFile.path, album: "PowerVAR" );
@@ -389,7 +389,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         label: saved ? "Exit" : "Discard"
                     )
                 ]
-            ) : const BottomAppBar()
+            )
         );
     }
 }
