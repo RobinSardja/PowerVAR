@@ -316,7 +316,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         )
                     ),
                     Align(
-                        alignment: Alignment.bottomRight,
+                        alignment: Alignment.bottomCenter,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: FloatingActionButton(
@@ -334,6 +334,18 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                     });
                                 },
                                 child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
+                            )
+                        )
+                    ),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: FloatingActionButton(
+                                onPressed: () {
+                                    widget.videoController.setVolume( 1 - widget.videoController.value.volume );
+                                },
+                                child: Icon( widget.videoController.value.volume == 0 ? Icons.volume_off : Icons.volume_up )
                             )
                         )
                     )
@@ -385,8 +397,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         label: "Share lift"
                     ),
                     NavigationDestination(
-                        icon: Icon( saved ? Icons.keyboard_return : Icons.delete ),
-                        label: saved ? "Exit" : "Discard"
+                        icon: Icon( saved || !widget.fromCamera ? Icons.keyboard_return : Icons.delete ),
+                        label: saved || !widget.fromCamera ? "Exit" : "Discard"
                     )
                 ]
             )
