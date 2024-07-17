@@ -2,6 +2,7 @@ import "dart:async";
 import "dart:io";
 
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 
 import "package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart";
 
@@ -12,6 +13,8 @@ import "package:path_provider/path_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:share_plus/share_plus.dart";
 import "package:video_player/video_player.dart";
+
+import "pose_detection/pose_painter.dart";
 
 class CameraPage extends StatefulWidget {
 	const CameraPage({
@@ -32,16 +35,29 @@ class _CameraPageState extends State<CameraPage> {
     late int resolutionPreset;
     late CameraController _cameraController;
     late Future<void> _initalizeControllerFuture;
+    late CameraLensDirection cameraLensDirection;
 
     VideoPlayerController? videoController;
     Future<void>? initializeVideoPlayerFuture;
 
+    final imagePicker = ImagePicker();
+
+    late bool enableTracking;
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
 
-    final imagePicker = ImagePicker();
-
     bool isRecording = false;
+    bool canProcess = true;
+    bool isBusy = false;
+
+    CustomPaint? customPaint;
+
+    final _orientations = {
+        DeviceOrientation.portraitUp: 0,
+        DeviceOrientation.landscapeLeft: 90,
+        DeviceOrientation.portraitDown: 180,
+        DeviceOrientation.landscapeRight: 270
+    };
 
     void initPoseDetector() {
         poseDetector = PoseDetector(
@@ -51,13 +67,85 @@ class _CameraPageState extends State<CameraPage> {
         );
     }
 
+    InputImage? inputImageFromCameraImage( CameraImage image ) {
+        final camera = _cameraController.description;
+        final sensorOrientation = camera.sensorOrientation;
+
+        InputImageRotation? rotation;
+        if( Platform.isIOS ) {
+            rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+        } else {
+            var rotationCompensation = _orientations[ _cameraController.value.deviceOrientation ];
+            if( rotationCompensation == null ) return null;
+            if( camera.lensDirection == CameraLensDirection.front ) {
+                rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
+            } else {
+                rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+            }
+            rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+        }
+        if( rotation == null ) return null;
+
+        final format = InputImageFormatValue.fromRawValue(image.format.raw);
+
+        if( format == null || (Platform.isAndroid && format != InputImageFormat.nv21) || (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
+        if( image.planes.length != 1 ) return null;
+
+        final plane = image.planes.first;
+
+        return InputImage.fromBytes(
+            bytes: plane.bytes,
+            metadata: InputImageMetadata(
+                size: Size( image.width.toDouble(), image.height.toDouble() ),
+                rotation: rotation,
+                format: format,
+                bytesPerRow: plane.bytesPerRow
+            )
+        );
+    }
+
+    Future<void> processImage( InputImage inputImage ) async {
+        if( !canProcess ) return;
+        if( isBusy ) return;
+
+        setState( () => isBusy = true );
+
+        final poses = await poseDetector!.processImage(inputImage);
+
+        if( inputImage.metadata?.size != null && inputImage.metadata?.rotation != null ) {
+            final painter = PosePainter(
+                poses,
+                inputImage.metadata!.size,
+                inputImage.metadata!.rotation,
+                cameraLensDirection
+            );
+            customPaint = CustomPaint( painter: painter );
+        } else {
+            customPaint = null;
+        }
+
+        if( mounted ) {
+            setState( () => isBusy = false );
+        }
+    }
+
+    void processCameraImage( CameraImage image ) {
+        final inputImage = inputImageFromCameraImage(image);
+        if( inputImage == null ) return;
+        processImage(inputImage);
+    }
+
     void initCamera() {
         _cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
-            ResolutionPreset.values[ resolutionPreset ]
+            ResolutionPreset.values[ resolutionPreset ],
+            imageFormatGroup: Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.nv21
         );
 
-        _initalizeControllerFuture = _cameraController.initialize();
+        _initalizeControllerFuture = _cameraController.initialize().then((_) {
+            if( enableTracking ) _cameraController.startImageStream(processCameraImage);
+        });
+        cameraLensDirection = _cameraController.description.lensDirection;
     }
 
     void initLiftPreview( XFile source, bool fromCamera ) async {
@@ -96,10 +184,12 @@ class _CameraPageState extends State<CameraPage> {
     void initState() {
         super.initState();
 
+        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
         frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
         poseModel = widget.settings.getBool( "hyperAccuracy" ) ?? false ? PoseDetectionModel.accurate : PoseDetectionModel.base;
         resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? 0;
 
+        if( enableTracking ) initPoseDetector();
         initCamera();
     }
 
@@ -125,7 +215,10 @@ class _CameraPageState extends State<CameraPage> {
                             future: _initalizeControllerFuture,
                             builder: (context, snapshot) {
                                 return snapshot.connectionState == ConnectionState.done ?
-                                CameraPreview(_cameraController) :
+                                CameraPreview(
+                                    _cameraController,
+                                    child: customPaint
+                                ) :
                                 const Center( child: CircularProgressIndicator.adaptive() );
                             }
                         )
