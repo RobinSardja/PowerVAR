@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ListTile(
                         title: const Text( "Generate advice (coming soon!)" ),
                         trailing: Switch(
-                            value: false, // generateAdvice,
+                            value: generateAdvice,
                             onChanged: (value) {
                                 setState( () => generateAdvice = value );
                             }

@@ -53,7 +53,7 @@ class _PowerVARState extends State<PowerVAR> {
                 onDestinationSelected: ( selectedDestination ) {
                     setState(() {
                         selectedIndex = selectedDestination;
-                        pageController.jumpToPage(selectedDestination);
+                        pageController.jumpToPage( selectedDestination );
                     });
                 },
                 selectedIndex: selectedIndex,

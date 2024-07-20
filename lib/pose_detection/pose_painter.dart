@@ -77,7 +77,7 @@ class PosePainter extends CustomPainter {
                 );
             });
 
-            void paintLine( PoseLandmarkType type1, PoseLandmarkType type2, Paint paintType ) {
+            void paintLine( PoseLandmarkType type1, PoseLandmarkType type2 ) {
                 final PoseLandmark joint1 = pose.landmarks[type1]!;
                 final PoseLandmark joint2 = pose.landmarks[type2]!;
 
@@ -114,27 +114,27 @@ class PosePainter extends CustomPainter {
                             cameraLensDirection
                         )
                     ),
-                    paintType
+                    paint
                 );
             }
 
             // draw arms
-            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, paint );
-            paintLine( PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, paint );
-            paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow, paint );
-            paintLine( PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, paint );
+            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow );
+            paintLine( PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist );
+            paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow );
+            paintLine( PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist );
 
             // draw body
-            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder, paint );
-            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, paint );
-            paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip, paint );
-            paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.rightHip, paint );
+            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder );
+            paintLine( PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip );
+            paintLine( PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip );
+            paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.rightHip );
 
             // draw legs
-            paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, paint );
-            paintLine( PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, paint );
-            paintLine( PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, paint );
-            paintLine( PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, paint );
+            paintLine( PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee );
+            paintLine( PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle );
+            paintLine( PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee );
+            paintLine( PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle );
         }
     }
 

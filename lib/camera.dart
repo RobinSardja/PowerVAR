@@ -33,8 +33,8 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
     late bool frontOrBack;
     late int resolutionPreset;
-    late CameraController _cameraController;
-    late Future<void> _initalizeControllerFuture;
+    late CameraController cameraController;
+    late Future<void> initalizeControllerFuture;
     late CameraLensDirection cameraLensDirection;
 
     VideoPlayerController? videoController;
@@ -52,7 +52,7 @@ class _CameraPageState extends State<CameraPage> {
 
     CustomPaint? customPaint;
 
-    final _orientations = {
+    final orientations = {
         DeviceOrientation.portraitUp: 0,
         DeviceOrientation.landscapeLeft: 90,
         DeviceOrientation.portraitDown: 180,
@@ -68,14 +68,14 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     InputImage? inputImageFromCameraImage( CameraImage image ) {
-        final camera = _cameraController.description;
+        final camera = cameraController.description;
         final sensorOrientation = camera.sensorOrientation;
 
         InputImageRotation? rotation;
         if( Platform.isIOS ) {
             rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
         } else {
-            var rotationCompensation = _orientations[ _cameraController.value.deviceOrientation ];
+            var rotationCompensation = orientations[ cameraController.value.deviceOrientation ];
             if( rotationCompensation == null ) return null;
             if( camera.lensDirection == CameraLensDirection.front ) {
                 rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
@@ -136,19 +136,19 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     void initCamera() {
-        _cameraController = CameraController(
+        cameraController = CameraController(
             widget.cameras[ frontOrBack ? 0 : 1 ],
             ResolutionPreset.values[ resolutionPreset ],
             imageFormatGroup: Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.nv21
         );
 
-        _initalizeControllerFuture = _cameraController.initialize().then((_) {
-            if( enableTracking ) _cameraController.startImageStream(processCameraImage);
+        initalizeControllerFuture = cameraController.initialize().then((_) {
+            if( enableTracking ) cameraController.startImageStream(processCameraImage);
         });
-        cameraLensDirection = _cameraController.description.lensDirection;
+        cameraLensDirection = cameraController.description.lensDirection;
     }
 
-    void initLiftPreview( XFile source, bool fromCamera ) async {
+    void initLiftPreview( XFile source, bool fromGal ) async {
         videoController = VideoPlayerController.file( File(source.path) );
         initializeVideoPlayerFuture = videoController!.initialize();
 
@@ -165,7 +165,7 @@ class _CameraPageState extends State<CameraPage> {
                         if( snapshot.connectionState == ConnectionState.done ) {
 
                             return LiftPreview(
-                                fromCamera: fromCamera,
+                                fromGal: fromGal,
                                 source: source,
                                 settings: widget.settings,
                                 videoController: videoController!
@@ -195,7 +195,7 @@ class _CameraPageState extends State<CameraPage> {
 
     @override
     void dispose() {
-        _cameraController.dispose();
+        cameraController.dispose();
         videoController?.dispose();
         poseDetector?.close();
 
@@ -212,11 +212,11 @@ class _CameraPageState extends State<CameraPage> {
                 children: [
                     Center(
                         child: FutureBuilder<void>(
-                            future: _initalizeControllerFuture,
+                            future: initalizeControllerFuture,
                             builder: (context, snapshot) {
                                 return snapshot.connectionState == ConnectionState.done ?
                                 CameraPreview(
-                                    _cameraController,
+                                    cameraController,
                                     child: customPaint
                                 ) :
                                 const Center( child: CircularProgressIndicator.adaptive() );
@@ -240,7 +240,7 @@ class _CameraPageState extends State<CameraPage> {
                                         try {
                                             final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
 
-                                            if( galleryVideo != null ) initLiftPreview( galleryVideo, false );
+                                            if( galleryVideo != null ) initLiftPreview( galleryVideo, true );
                                         } catch (e) {
                                             // HANDLE ERROR
                                         }
@@ -260,14 +260,14 @@ class _CameraPageState extends State<CameraPage> {
                                         if( isRecording ) {
                                             setState( () => isRecording = false );
                             
-                                            final recording = await _cameraController.stopVideoRecording();
+                                            final recording = await cameraController.stopVideoRecording();
 
-                                            initLiftPreview( recording, true );
+                                            initLiftPreview( recording, false );
                                         } else {
                                             setState( () => isRecording = true );
                             
-                                            await _cameraController.prepareForVideoRecording();
-                                            _cameraController.startVideoRecording();
+                                            await cameraController.prepareForVideoRecording();
+                                            cameraController.startVideoRecording();
                                         }
                                     } catch (e) {
                                         // HANDLE ERROR
@@ -292,7 +292,7 @@ class _CameraPageState extends State<CameraPage> {
                                         );
                                     } else {
                                         try {
-                                            await _cameraController.dispose();
+                                            await cameraController.dispose();
                                             setState( () => frontOrBack = !frontOrBack );
                                             initCamera();
                                         } catch (e) {
@@ -313,13 +313,13 @@ class _CameraPageState extends State<CameraPage> {
 class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
-        required this.fromCamera,
+        required this.fromGal,
         required this.source,
         required this.settings,
         required this.videoController
     });
 
-    final bool fromCamera;
+    final bool fromGal;
     final XFile source;
     final SharedPreferences settings; 
     final VideoPlayerController videoController;
@@ -426,7 +426,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                         }
                                     });
                                 },
-                                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow ),
+                                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow )
                             )
                         )
                     ),
@@ -455,7 +455,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
 
                     switch(value) {
                         case 0:
-                            if( saved || !widget.fromCamera ) {
+                            if( saved || widget.fromGal ) {
                                 simpleSnackBar( "Lift already saved!" );
                             } else {
                                 await Gal.putVideo( newFile.path, album: "PowerVAR" );
@@ -490,8 +490,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         label: "Share lift"
                     ),
                     NavigationDestination(
-                        icon: Icon( saved || !widget.fromCamera ? Icons.keyboard_return : Icons.delete ),
-                        label: saved || !widget.fromCamera ? "Exit" : "Discard"
+                        icon: Icon( saved || widget.fromGal ? Icons.keyboard_return : Icons.delete ),
+                        label: saved || widget.fromGal ? "Exit" : "Discard"
                     )
                 ]
             )

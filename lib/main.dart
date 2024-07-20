@@ -19,13 +19,14 @@ Future<void> main() async {
     ].request();
 
     if( perms.values.every( (value) => value == PermissionStatus.granted ) ) {
-
+        // TODO: permission handling
     }
 
 	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
 	runApp(
         MaterialApp(
+            title: "Pose detection for weightlifting.",
 			debugShowCheckedModeBanner: false,
 			theme: ThemeData.light().copyWith(
 				appBarTheme: const AppBarTheme(
