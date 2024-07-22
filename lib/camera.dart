@@ -46,6 +46,7 @@ class _CameraPageState extends State<CameraPage> {
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
 
+    bool isFlipping = false;
     bool isRecording = false;
     bool canProcess = true;
     bool isBusy = false;
@@ -283,6 +284,9 @@ class _CameraPageState extends State<CameraPage> {
                             padding: const EdgeInsets.all(16.0),
                             child: FloatingActionButton(
                                 onPressed: () async {
+                                    if( isFlipping ) return;
+                                    setState( () => isFlipping = true );
+
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
@@ -292,13 +296,16 @@ class _CameraPageState extends State<CameraPage> {
                                         );
                                     } else {
                                         try {
-                                            await cameraController.dispose();
                                             setState( () => frontOrBack = !frontOrBack );
                                             initCamera();
+                                            // TODO: proper fix for flip spamming
+                                            await Future.delayed( const Duration(seconds: 1) );
                                         } catch (e) {
                                             // HANDLE ERROR
                                         }
                                     }
+
+                                    setState( () => isFlipping = false );
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
                             )
