@@ -297,9 +297,7 @@ class _CameraPageState extends State<CameraPage> {
                                     } else {
                                         try {
                                             setState( () => frontOrBack = !frontOrBack );
-                                            initCamera();
-                                            // TODO: proper fix for flip spamming
-                                            await Future.delayed( const Duration(seconds: 1) );
+                                            await cameraController.setDescription( widget.cameras[ frontOrBack ? 0 : 1 ] );
                                         } catch (e) {
                                             // HANDLE ERROR
                                         }
