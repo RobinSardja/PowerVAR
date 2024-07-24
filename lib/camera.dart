@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:io";
+import "dart:ui";
 
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -45,6 +46,8 @@ class _CameraPageState extends State<CameraPage> {
     late bool enableTracking;
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
+
+    double blurAmount = 0;
 
     bool isFlipping = false;
     bool isRecording = false;
@@ -216,9 +219,12 @@ class _CameraPageState extends State<CameraPage> {
                             future: initalizeControllerFuture,
                             builder: (context, snapshot) {
                                 return snapshot.connectionState == ConnectionState.done ?
-                                CameraPreview(
-                                    cameraController,
-                                    child: customPaint
+                                ImageFiltered(
+                                    imageFilter: ImageFilter.blur( sigmaX: blurAmount, sigmaY: blurAmount ),
+                                    child: CameraPreview(
+                                        cameraController,
+                                        child: customPaint
+                                    )
                                 ) :
                                 const Center( child: CircularProgressIndicator.adaptive() );
                             }
@@ -285,7 +291,11 @@ class _CameraPageState extends State<CameraPage> {
                             child: FloatingActionButton(
                                 onPressed: () async {
                                     if( isFlipping ) return;
-                                    setState( () => isFlipping = true );
+
+                                    setState(() {
+                                        isFlipping = true;
+                                        blurAmount = 10;
+                                    });
 
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -296,14 +306,22 @@ class _CameraPageState extends State<CameraPage> {
                                         );
                                     } else {
                                         try {
+                                            if( enableTracking ) await cameraController.stopImageStream();
+
                                             setState( () => frontOrBack = !frontOrBack );
-                                            await cameraController.setDescription( widget.cameras[ frontOrBack ? 0 : 1 ] );
+
+                                            await cameraController.setDescription( widget.cameras[ frontOrBack ? 0 : 1 ] ).then((_) {
+                                                if( enableTracking ) cameraController.startImageStream(processCameraImage);
+                                            });
                                         } catch (e) {
                                             // HANDLE ERROR
                                         }
                                     }
 
-                                    setState( () => isFlipping = false );
+                                    setState(() {
+                                        blurAmount = 0;
+                                        isFlipping = false;
+                                    });
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
                             )
