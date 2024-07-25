@@ -1,6 +1,5 @@
 import "dart:async";
 import "dart:io";
-import "dart:ui";
 
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -43,17 +42,14 @@ class _CameraPageState extends State<CameraPage> {
 
     final imagePicker = ImagePicker();
 
-    late bool enableTracking;
-    late PoseDetectionModel poseModel;
-    PoseDetector? poseDetector;
-
-    double blurAmount = 0;
-
     bool isFlipping = false;
     bool isRecording = false;
     bool canProcess = true;
     bool isBusy = false;
 
+    late bool enableTracking;
+    late PoseDetectionModel poseModel;
+    PoseDetector? poseDetector;
     CustomPaint? customPaint;
 
     final orientations = {
@@ -219,12 +215,9 @@ class _CameraPageState extends State<CameraPage> {
                             future: initalizeControllerFuture,
                             builder: (context, snapshot) {
                                 return snapshot.connectionState == ConnectionState.done ?
-                                ImageFiltered(
-                                    imageFilter: ImageFilter.blur( sigmaX: blurAmount, sigmaY: blurAmount ),
-                                    child: CameraPreview(
-                                        cameraController,
-                                        child: customPaint
-                                    )
+                                CameraPreview(
+                                    cameraController,
+                                    child: customPaint
                                 ) :
                                 const Center( child: CircularProgressIndicator.adaptive() );
                             }
@@ -292,10 +285,7 @@ class _CameraPageState extends State<CameraPage> {
                                 onPressed: () async {
                                     if( isFlipping ) return;
 
-                                    setState(() {
-                                        isFlipping = true;
-                                        blurAmount = 10;
-                                    });
+                                    setState( () => isFlipping = true );
 
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -318,10 +308,7 @@ class _CameraPageState extends State<CameraPage> {
                                         }
                                     }
 
-                                    setState(() {
-                                        blurAmount = 0;
-                                        isFlipping = false;
-                                    });
+                                    setState( () => isFlipping = false );
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
                             )
