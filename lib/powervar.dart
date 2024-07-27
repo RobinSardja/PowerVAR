@@ -51,10 +51,8 @@ class _PowerVARState extends State<PowerVAR> {
             ),
             bottomNavigationBar: NavigationBar(
                 onDestinationSelected: ( selectedDestination ) {
-                    setState(() {
-                        selectedIndex = selectedDestination;
-                        pageController.jumpToPage( selectedDestination );
-                    });
+                    setState( () => selectedIndex = selectedDestination );
+                    pageController.jumpToPage( selectedDestination );
                 },
                 selectedIndex: selectedIndex,
                 destinations: const [

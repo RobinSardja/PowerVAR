@@ -43,7 +43,7 @@ Future<void> main() async {
                     color: Colors.red
                 ),
                 switchTheme: SwitchThemeData(
-                    thumbColor:  WidgetStateProperty.resolveWith((state) {
+                    thumbColor: WidgetStateProperty.resolveWith((state) {
 						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;
 					}),
                     trackColor: WidgetStateProperty.resolveWith((state) {
@@ -100,8 +100,8 @@ Future<void> main() async {
                     color: Colors.white
                 ),
                 switchTheme: SwitchThemeData(
-                    thumbColor:  WidgetStateProperty.resolveWith((state) {
-						return state.contains( WidgetState.selected ) ? Colors.black : Colors.white;
+                    thumbColor: WidgetStateProperty.resolveWith((state) {
+					    return state.contains( WidgetState.selected ) ? Colors.black : Colors.white;
 					}),
                     trackColor: WidgetStateProperty.resolveWith((state) {
 						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;

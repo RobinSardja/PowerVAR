@@ -10,8 +10,8 @@ import "package:camera/camera.dart";
 import "package:gal/gal.dart";
 import "package:image_picker/image_picker.dart";
 import "package:path_provider/path_provider.dart";
-import "package:shared_preferences/shared_preferences.dart";
 import "package:share_plus/share_plus.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "package:video_player/video_player.dart";
 
 import "pose_detection/pose_painter.dart";
@@ -186,7 +186,7 @@ class _CameraPageState extends State<CameraPage> {
 
         enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
         frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
-        poseModel = widget.settings.getBool( "hyperAccuracy" ) ?? false ? PoseDetectionModel.accurate : PoseDetectionModel.base;
+        poseModel = (widget.settings.getBool( "hyperAccuracy" ) ?? false) ? PoseDetectionModel.accurate : PoseDetectionModel.base;
         resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? 0;
 
         if( enableTracking ) initPoseDetector();
