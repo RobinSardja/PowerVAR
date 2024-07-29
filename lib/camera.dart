@@ -381,8 +381,6 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         linearProgressController.dispose();
         widget.videoController.dispose();
 
-        widget.settings.setBool( "enableTracking", enableTracking );
-
         super.dispose();
     }
 
