@@ -11,13 +11,15 @@ class PosePainter extends CustomPainter {
         this.poses,
         this.imageSize,
         this.rotation,
-        this.cameraLensDirection
+        this.cameraLensDirection,
+        this.opacity
     );
 
     final List<Pose> poses;
     final Size imageSize;
     final InputImageRotation rotation;
     final CameraLensDirection cameraLensDirection;
+    final double opacity;
 
     final unwantedPoints = {
         PoseLandmarkType.nose,
@@ -48,7 +50,7 @@ class PosePainter extends CustomPainter {
         final paint = Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 5.0
-            ..color = Colors.red;
+            ..color = Color.fromRGBO(255, 0, 0, opacity);
 
         for( final pose in poses ) {
             pose.landmarks.forEach( (_, landmark ) {

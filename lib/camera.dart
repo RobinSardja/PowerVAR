@@ -51,6 +51,7 @@ class _CameraPageState extends State<CameraPage> {
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
     CustomPaint? customPaint;
+    double opacity = 1;
 
     final orientations = {
         DeviceOrientation.portraitUp: 0,
@@ -117,7 +118,8 @@ class _CameraPageState extends State<CameraPage> {
                 poses,
                 inputImage.metadata!.size,
                 inputImage.metadata!.rotation,
-                cameraLensDirection
+                cameraLensDirection,
+                opacity
             );
             customPaint = CustomPaint( painter: painter );
         } else {
@@ -285,7 +287,10 @@ class _CameraPageState extends State<CameraPage> {
                                 onPressed: () async {
                                     if( isFlipping ) return;
 
-                                    setState( () => isFlipping = true );
+                                    setState(() {
+                                        isFlipping = true;
+                                        opacity = 0;
+                                    });
 
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -308,7 +313,10 @@ class _CameraPageState extends State<CameraPage> {
                                         }
                                     }
 
-                                    setState( () => isFlipping = false );
+                                    setState(() {
+                                        opacity = 1;
+                                        isFlipping = false;
+                                    });
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
                             )
