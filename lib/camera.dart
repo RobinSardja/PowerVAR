@@ -287,10 +287,7 @@ class _CameraPageState extends State<CameraPage> {
                                 onPressed: () async {
                                     if( isFlipping ) return;
 
-                                    setState(() {
-                                        isFlipping = true;
-                                        opacity = 0;
-                                    });
+                                    setState( () => isFlipping = true );
 
                                     if( isRecording ) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -301,22 +298,25 @@ class _CameraPageState extends State<CameraPage> {
                                         );
                                     } else {
                                         try {
-                                            if( enableTracking ) await cameraController.stopImageStream();
+                                            if( enableTracking ) {
+                                                await cameraController.stopImageStream();
+                                                setState( () => opacity = 0 );
+                                            }
 
                                             setState( () => frontOrBack = !frontOrBack );
 
                                             await cameraController.setDescription( widget.cameras[ frontOrBack ? 0 : 1 ] ).then((_) {
-                                                if( enableTracking ) cameraController.startImageStream(processCameraImage);
+                                                if( enableTracking ) {
+                                                    cameraController.startImageStream(processCameraImage);
+                                                    setState( () => opacity = 1 );
+                                                }
                                             });
                                         } catch (e) {
                                             // HANDLE ERROR
                                         }
                                     }
 
-                                    setState(() {
-                                        opacity = 1;
-                                        isFlipping = false;
-                                    });
+                                    setState( () => isFlipping = false );
                                 },
                                 child: Icon( Platform.isIOS ? Icons.flip_camera_ios : Icons.flip_camera_android )
                             )
