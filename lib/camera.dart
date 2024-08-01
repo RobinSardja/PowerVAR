@@ -188,10 +188,7 @@ class _CameraPageState extends State<CameraPage> {
 
         enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
         frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
-
-        // TODO: poseModel stuck at false
         poseModel = (widget.settings.getBool( "hyperAccuracy" ) ?? false) ? PoseDetectionModel.accurate : PoseDetectionModel.base;
-
         resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? 0;
 
         if( enableTracking ) initPoseDetector();
