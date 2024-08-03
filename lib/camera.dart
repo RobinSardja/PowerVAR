@@ -37,6 +37,8 @@ class _CameraPageState extends State<CameraPage> {
     late Future<void> initalizeControllerFuture;
     late CameraLensDirection cameraLensDirection;
 
+    // TODO: optimize frontOrBack and cameraLensDirection
+
     VideoPlayerController? videoController;
     Future<void>? initializeVideoPlayerFuture;
 
@@ -59,6 +61,16 @@ class _CameraPageState extends State<CameraPage> {
         DeviceOrientation.portraitDown: 180,
         DeviceOrientation.landscapeRight: 270
     };
+
+    void simpleSnackBar( String content ) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text( content ),
+                behavior: SnackBarBehavior.floating,
+                showCloseIcon: true
+            )
+        );
+    }
 
     void initPoseDetector() {
         poseDetector = PoseDetector(
@@ -89,7 +101,7 @@ class _CameraPageState extends State<CameraPage> {
 
         final format = InputImageFormatValue.fromRawValue(image.format.raw);
 
-        if( format == null || (Platform.isAndroid && format != InputImageFormat.nv21) || (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
+        if( format == null || (Platform.isAndroid && format != InputImageFormat.nv21) || (Platform.isIOS && format != InputImageFormat.bgra8888) ) return null;
         if( image.planes.length != 1 ) return null;
 
         final plane = image.planes.first;
@@ -199,7 +211,7 @@ class _CameraPageState extends State<CameraPage> {
     void dispose() {
         cameraController.dispose();
         videoController?.dispose();
-        poseDetector?.close();
+        if( enableTracking ) poseDetector?.close();
 
         widget.settings.setBool( "frontOrBack", frontOrBack );
 
@@ -229,15 +241,10 @@ class _CameraPageState extends State<CameraPage> {
                         alignment: Alignment.bottomLeft,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Gallery button
                                 onPressed: () async {
                                     if( isRecording ) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                                content: Text( "Gallery locked while recording" ),
-                                                behavior: SnackBarBehavior.floating
-                                            )
-                                        );
+                                        simpleSnackBar( "Gallery locked while recording" );
                                     } else {
                                         try {
                                             final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
@@ -256,7 +263,7 @@ class _CameraPageState extends State<CameraPage> {
                         alignment: Alignment.bottomCenter,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Record button
                                 onPressed: () async {
                                     try {
                                         if( isRecording ) {
@@ -287,19 +294,14 @@ class _CameraPageState extends State<CameraPage> {
                         alignment: Alignment.bottomRight,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Flip camera button
                                 onPressed: () async {
                                     if( isFlipping ) return;
 
                                     setState( () => isFlipping = true );
 
                                     if( isRecording ) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                                content: Text( "Flipping locked while recording" ),
-                                                behavior: SnackBarBehavior.floating
-                                            )
-                                        );
+                                        simpleSnackBar( "Flipping locked while recording" );
                                     } else {
                                         try {
                                             if( enableTracking ) {
@@ -382,8 +384,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         linearProgressController = AnimationController(
             vsync: this,
             duration: widget.videoController.value.duration
-        )..addListener( () {
-            setState(() {});
+        )..addListener(() {
+            setState( () {} );
         });
         linearProgressController.repeat();
     }
@@ -420,7 +422,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         alignment: Alignment.bottomLeft,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Tracking button
                                 onPressed: () {
                                     setState( () => enableTracking = !enableTracking );
                                 },
@@ -432,7 +434,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         alignment: Alignment.bottomCenter,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Play button
                                 onPressed: () {
                                     setState(() {
                                         if( widget.videoController.value.isPlaying ) {
@@ -454,7 +456,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         alignment: Alignment.bottomRight,
                         child: Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton(
+                            child: FloatingActionButton( // Mute button
                                 onPressed: () {
                                     widget.videoController.setVolume( 1 - widget.videoController.value.volume );
                                 },
