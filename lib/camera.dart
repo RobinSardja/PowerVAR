@@ -35,9 +35,6 @@ class _CameraPageState extends State<CameraPage> {
     late int resolutionPreset;
     late CameraController cameraController;
     late Future<void> initalizeControllerFuture;
-    late CameraLensDirection cameraLensDirection;
-
-    // TODO: optimize frontOrBack and cameraLensDirection
 
     VideoPlayerController? videoController;
     Future<void>? initializeVideoPlayerFuture;
@@ -130,7 +127,7 @@ class _CameraPageState extends State<CameraPage> {
                 poses,
                 inputImage.metadata!.size,
                 inputImage.metadata!.rotation,
-                cameraLensDirection,
+                frontOrBack ? CameraLensDirection.front : CameraLensDirection.back,
                 opacity
             );
             customPaint = CustomPaint( painter: painter );
@@ -159,7 +156,6 @@ class _CameraPageState extends State<CameraPage> {
         initalizeControllerFuture = cameraController.initialize().then((_) {
             if( enableTracking ) cameraController.startImageStream(processCameraImage);
         });
-        cameraLensDirection = cameraController.description.lensDirection;
     }
 
     void initLiftPreview( XFile source, bool fromGal ) async {
