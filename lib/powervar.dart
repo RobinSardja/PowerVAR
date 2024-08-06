@@ -24,7 +24,7 @@ class PowerVAR extends StatefulWidget {
 	State<PowerVAR> createState() => _PowerVARState();
 }
 
-class _PowerVARState extends State<PowerVAR> {
+class _PowerVARState extends State<PowerVAR> with WidgetsBindingObserver {
 
     late Map<Permission, PermissionStatus> access;
 
@@ -35,6 +35,15 @@ class _PowerVARState extends State<PowerVAR> {
         super.initState();
 
         access = widget.perms;
+        WidgetsBinding.instance.addObserver(this);
+    }
+
+    @override
+    void didChangeAppLifecycleState(AppLifecycleState state) async {
+        if( state == AppLifecycleState.resumed ) {
+            access = await access.keys.toList().request();
+            setState(() {});
+        }
     }
 
 	@override
@@ -86,7 +95,6 @@ class _PowerVARState extends State<PowerVAR> {
                 child: TextButton(
                     onPressed: () async {
                         if( access.values.any( (value) => value == PermissionStatus.permanentlyDenied ) ) {
-                            // TODO: fix bug where permissions granted in app settings are not reflected in app
                             await openAppSettings();
                         } else {
                             access = await access.keys.toList().request();
