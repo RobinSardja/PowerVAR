@@ -50,6 +50,7 @@ class _CameraPageState extends State<CameraPage> {
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
     CustomPaint? customPaint;
+    List<CustomPaint?> paintList = [];
     double opacity = 1;
 
     final orientations = {
@@ -138,6 +139,10 @@ class _CameraPageState extends State<CameraPage> {
         if( mounted ) {
             setState( () => isBusy = false );
         }
+
+        if( isRecording ) {
+            paintList.add(customPaint);
+        }
     }
 
     void processCameraImage( CameraImage image ) {
@@ -176,6 +181,7 @@ class _CameraPageState extends State<CameraPage> {
 
                             return LiftPreview(
                                 fromGal: fromGal,
+                                paintList: paintList,
                                 source: source,
                                 settings: widget.settings,
                                 videoController: videoController!
@@ -269,11 +275,16 @@ class _CameraPageState extends State<CameraPage> {
                                             final recording = await cameraController.stopVideoRecording();
                                             initLiftPreview( recording, false );
 
-                                            if( enableTracking ) cameraController.startImageStream(processCameraImage);
+                                            if( enableTracking ) {
+                                                cameraController.startImageStream(processCameraImage);
+                                            }
                                         } else {
                                             setState( () => isRecording = true );
 
-                                            if( enableTracking ) cameraController.stopImageStream();
+                                            if( enableTracking ) {
+                                                paintList.clear();
+                                                cameraController.stopImageStream();
+                                            } 
 
                                             await cameraController.prepareForVideoRecording();
                                             await cameraController.startVideoRecording( onAvailable: enableTracking ? processCameraImage : null );
@@ -334,12 +345,14 @@ class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
         required this.fromGal,
+        required this.paintList,
         required this.source,
         required this.settings,
         required this.videoController
     });
 
     final bool fromGal;
+    final List<CustomPaint?> paintList;
     final XFile source;
     final SharedPreferences settings; 
     final VideoPlayerController videoController;
@@ -353,6 +366,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
     late AnimationController linearProgressController;
 
     late bool enableTracking;
+    late double formula;
 
     bool renamedFiles = false;
     bool saved = false;
@@ -376,6 +390,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         super.initState();
 
         enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
+        formula = widget.videoController.value.duration.inMicroseconds / widget.paintList.length;
 
         linearProgressController = AnimationController(
             vsync: this,
@@ -406,6 +421,12 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         child: AspectRatio(
                             aspectRatio: widget.videoController.value.aspectRatio,
                             child: VideoPlayer( widget.videoController )
+                        )
+                    ),
+                    Center(
+                        child: AspectRatio(
+                            aspectRatio: widget.videoController.value.aspectRatio,
+                            child: widget.paintList[ (widget.videoController.value.position.inMicroseconds / formula).floor() ] // TODO: improve efficiency
                         )
                     ),
                     Align(
