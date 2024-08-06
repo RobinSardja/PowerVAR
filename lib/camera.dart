@@ -425,7 +425,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                     ),
                     Center(
                         child: AspectRatio(
-                            aspectRatio: widget.videoController.value.aspectRatio,
+                            aspectRatio: widget.videoController.value.aspectRatio, // TODO: fix bug where front facing tracking is mirrored
                             child: widget.paintList[ (widget.videoController.value.position.inMicroseconds / formula).floor() ] // TODO: improve efficiency
                         )
                     ),
