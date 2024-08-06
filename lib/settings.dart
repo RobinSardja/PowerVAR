@@ -28,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
         enableTracking = widget.settings.getBool("enableTracking") ?? true;
         hyperAccuracy = widget.settings.getBool("hyperAccuracy") ?? false;
         generateAdvice = widget.settings.getBool("generateAdvice") ?? false;
-        resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 0;
+        resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 1;
     }
 
 	@override

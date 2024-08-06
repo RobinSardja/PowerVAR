@@ -9,6 +9,7 @@ import "powervar.dart";
 
 Future<void> main() async {
 	WidgetsFlutterBinding.ensureInitialized();
+	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     final cameras = await availableCameras();
     final settings = await SharedPreferences.getInstance();
@@ -17,12 +18,6 @@ Future<void> main() async {
         Permission.microphone,
         Permission.mediaLibrary
     ].request();
-
-    if( perms.values.every( (value) => value == PermissionStatus.granted ) ) {
-        // TODO: permission handling
-    }
-
-	SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
 	runApp(
         MaterialApp(
@@ -38,6 +33,12 @@ Future<void> main() async {
                 floatingActionButtonTheme: const FloatingActionButtonThemeData(
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white
+                ),
+                textButtonTheme: const TextButtonThemeData(
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll( Colors.red ),
+                        foregroundColor: WidgetStatePropertyAll( Colors.white )
+                    )
                 ),
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
                     color: Colors.red
@@ -96,6 +97,12 @@ Future<void> main() async {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black
                 ),
+                textButtonTheme: const TextButtonThemeData(
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll( Colors.white ),
+                        foregroundColor: WidgetStatePropertyAll( Colors.black )
+                    )
+                ),
                 progressIndicatorTheme: const ProgressIndicatorThemeData(
                     color: Colors.white
                 ),
@@ -142,7 +149,7 @@ Future<void> main() async {
 					)
 				)
 			),
-            home: PowerVAR( cameras: cameras, settings: settings )
+            home: PowerVAR( cameras: cameras, perms: perms, settings: settings )
         )
     );
 }

@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 
 import "package:camera/camera.dart";
+import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "camera.dart";
@@ -11,10 +12,12 @@ class PowerVAR extends StatefulWidget {
 	const PowerVAR({
         super.key,
         required this.cameras,
+        required this.perms,
         required this.settings
     });
 
     final List<CameraDescription> cameras;
+    final Map<Permission, PermissionStatus> perms;
     final SharedPreferences settings;
 
 	@override
@@ -23,8 +26,16 @@ class PowerVAR extends StatefulWidget {
 
 class _PowerVARState extends State<PowerVAR> {
 
+    late Map<Permission, PermissionStatus> access;
+
 	// selected index for navigation bar
 	int selectedIndex = 1;
+
+    @override initState() {
+        super.initState();
+
+        access = widget.perms;
+    }
 
 	@override
 	Widget build(BuildContext context) {
@@ -34,7 +45,7 @@ class _PowerVARState extends State<PowerVAR> {
 			initialPage: selectedIndex,
 		);
 
-		return Scaffold(
+		return access.values.every( (value) => value == PermissionStatus.granted ) ? Scaffold(
             appBar: AppBar(
                 title: const Text( "PowerVAR" )
             ),
@@ -70,6 +81,21 @@ class _PowerVARState extends State<PowerVAR> {
                     )
                 ]
             )
-		);
+		) : Scaffold(
+            body: Center(
+                child: TextButton(
+                    onPressed: () async {
+                        if( access.values.any( (value) => value == PermissionStatus.permanentlyDenied ) ) {
+                            // TODO: fix bug where permissions granted in app settings are not reflected in app
+                            await openAppSettings();
+                        } else {
+                            access = await access.keys.toList().request();
+                        }
+                        setState(() {});
+                    },
+                    child: const Text( "Grant permissions" )
+                )
+            )
+        );
 	}
 }
