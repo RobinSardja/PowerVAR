@@ -50,6 +50,7 @@ class _CameraPageState extends State<CameraPage> {
     late PoseDetectionModel poseModel;
     PoseDetector? poseDetector;
     CustomPaint? customPaint;
+    List<CustomPaint?> paintList = [];
     double opacity = 1;
 
     final orientations = {
@@ -135,6 +136,10 @@ class _CameraPageState extends State<CameraPage> {
             customPaint = null;
         }
 
+        if( isRecording ) {
+            paintList.add(customPaint);
+        }
+
         if( mounted ) {
             setState( () => isBusy = false );
         }
@@ -176,6 +181,8 @@ class _CameraPageState extends State<CameraPage> {
 
                             return LiftPreview(
                                 fromGal: fromGal,
+                                frontOrBack: frontOrBack,
+                                paintList: paintList,
                                 source: source,
                                 settings: widget.settings,
                                 videoController: videoController!
@@ -276,6 +283,7 @@ class _CameraPageState extends State<CameraPage> {
                                             setState( () => isRecording = true );
 
                                             if( enableTracking ) {
+                                                paintList.clear();
                                                 cameraController.stopImageStream();
                                             } 
 
@@ -338,12 +346,16 @@ class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
         required this.fromGal,
+        required this.frontOrBack,
+        required this.paintList,
         required this.source,
         required this.settings,
         required this.videoController
     });
 
     final bool fromGal;
+    final bool? frontOrBack;
+    final List<CustomPaint?> paintList;
     final XFile source;
     final SharedPreferences settings; 
     final VideoPlayerController videoController;
@@ -355,9 +367,9 @@ class LiftPreview extends StatefulWidget {
 class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin {
 
     late AnimationController linearProgressController;
+    int paintListIndex = 0;
 
     late bool enableTracking;
-    late double formula;
 
     bool renamedFiles = false;
     bool saved = false;
@@ -385,8 +397,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         linearProgressController = AnimationController(
             vsync: this,
             duration: widget.videoController.value.duration
-        )..addListener(() {
-            setState( () {} );
+        )..addListener(() { // TODO: fix delay with overlay
+            setState( () => paintListIndex = ( ( linearProgressController.lastElapsedDuration!.inMicroseconds % linearProgressController.duration!.inMicroseconds ) / widget.videoController.value.duration.inMicroseconds * widget.paintList.length).floor() );
         });
         linearProgressController.repeat();
     }
@@ -411,6 +423,15 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         child: AspectRatio(
                             aspectRatio: widget.videoController.value.aspectRatio,
                             child: VideoPlayer( widget.videoController )
+                        )
+                    ),
+                    Center(
+                        child: Transform.flip(
+                            flipX: !widget.frontOrBack!,
+                            child: AspectRatio(
+                                aspectRatio: widget.videoController.value.aspectRatio,
+                                child: widget.paintList[paintListIndex]
+                            )
                         )
                     ),
                     Align(
