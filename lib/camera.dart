@@ -216,8 +216,6 @@ class _CameraPageState extends State<CameraPage> {
         videoController?.dispose();
         if( enableTracking ) poseDetector?.close();
 
-        widget.settings.setBool( "frontOrBack", frontOrBack );
-
         super.dispose();
     }
 
@@ -317,7 +315,10 @@ class _CameraPageState extends State<CameraPage> {
                                                 await cameraController.stopImageStream();
                                             }
 
-                                            setState( () => frontOrBack = !frontOrBack );
+                                            setState( () {
+                                                frontOrBack = !frontOrBack;
+                                                widget.settings.setBool( "frontOrBack", frontOrBack );
+                                            });
 
                                             await cameraController.setDescription( widget.cameras[ frontOrBack ? 0 : 1 ] ).then((_) {
                                                 if( enableTracking ) {
