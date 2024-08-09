@@ -434,7 +434,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                     flipX: !widget.frontOrBack!,
                                     child: AspectRatio(
                                         aspectRatio: widget.videoController.value.aspectRatio,
-                                        child: widget.paintList[ (value * widget.paintList.length).floor() ] // TODO: fix delay
+                                        child: widget.paintList.isNotEmpty && enableTracking ? widget.paintList[ (value * widget.paintList.length).floor() ] : null // TODO: fix delay
                                     )
                                 );
                             }
