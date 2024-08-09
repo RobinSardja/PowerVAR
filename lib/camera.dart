@@ -400,8 +400,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             duration: widget.videoController.value.duration
         )..addListener(() {
             setState( () {} );
-        });
-        linearProgressController.repeat();
+        })
+        ..repeat();
     }
 
     @override
@@ -434,7 +434,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                                     flipX: !widget.frontOrBack!,
                                     child: AspectRatio(
                                         aspectRatio: widget.videoController.value.aspectRatio,
-                                        child: widget.paintList[ (value * widget.paintList.length).floor() ]
+                                        child: widget.paintList[ (value * widget.paintList.length).floor() ] // TODO: fix delay
                                     )
                                 );
                             }
@@ -464,17 +464,16 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             padding: const EdgeInsets.all(16.0),
                             child: FloatingActionButton( // Play button
                                 onPressed: () {
-                                    setState(() {
-                                        if( widget.videoController.value.isPlaying ) {
-                                            widget.videoController.pause();
-                                            linearProgressController.stop();
-                                        } else {
-                                            widget.videoController.play();
-                                            linearProgressController
-                                                ..forward( from: linearProgressController.value )
-                                                ..repeat();
-                                        }
-                                    });
+                                    if( widget.videoController.value.isPlaying ) {
+                                        linearProgressController.stop();
+                                        widget.videoController.pause();
+                                    } else {
+                                        linearProgressController
+                                            ..forward()
+                                            ..repeat();
+                                        widget.videoController.play();
+                                    }
+                                    setState( () {} );
                                 },
                                 child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow )
                             )
