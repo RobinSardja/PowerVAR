@@ -367,7 +367,7 @@ class LiftPreview extends StatefulWidget {
 class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin {
 
     late AnimationController linearProgressController;
-    int paintListIndex = 0;
+    int bruh = 0;
 
     late bool enableTracking;
 
@@ -397,8 +397,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         linearProgressController = AnimationController(
             vsync: this,
             duration: widget.videoController.value.duration
-        )..addListener(() { // TODO: fix delay with overlay
-            setState( () => paintListIndex = ( ( linearProgressController.lastElapsedDuration!.inMicroseconds % linearProgressController.duration!.inMicroseconds ) / widget.videoController.value.duration.inMicroseconds * widget.paintList.length).floor() );
+        )..addListener(() {
+            setState( () {} );
         });
         linearProgressController.repeat();
     }
@@ -426,12 +426,17 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                         )
                     ),
                     Center(
-                        child: Transform.flip(
-                            flipX: !widget.frontOrBack!,
-                            child: AspectRatio(
-                                aspectRatio: widget.videoController.value.aspectRatio,
-                                child: widget.paintList[paintListIndex]
-                            )
+                        child: ValueListenableBuilder(
+                            valueListenable: linearProgressController,
+                            builder: ( context, value, child ) {
+                                return Transform.flip(
+                                    flipX: !widget.frontOrBack!,
+                                    child: AspectRatio(
+                                        aspectRatio: widget.videoController.value.aspectRatio,
+                                        child: widget.paintList[ (value * widget.paintList.length).floor() ]
+                                    )
+                                );
+                            }
                         )
                     ),
                     Align(
