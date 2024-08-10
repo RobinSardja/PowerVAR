@@ -247,6 +247,7 @@ class _CameraPageState extends State<CameraPage> {
                                     if( isRecording ) {
                                         simpleSnackBar( "Gallery locked while recording" );
                                     } else {
+                                        paintList.clear();
                                         try {
                                             final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
 
