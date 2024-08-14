@@ -43,7 +43,6 @@ class _CameraPageState extends State<CameraPage> {
 
     bool isFlipping = false;
     bool isRecording = false;
-    bool canProcess = true;
     bool isBusy = false;
 
     late bool enableTracking;
@@ -116,7 +115,6 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     Future<void> processImage( InputImage inputImage ) async {
-        if( !canProcess ) return;
         if( isBusy ) return;
 
         setState( () => isBusy = true );
