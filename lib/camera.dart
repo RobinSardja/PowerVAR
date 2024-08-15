@@ -36,9 +36,6 @@ class _CameraPageState extends State<CameraPage> {
     late CameraController cameraController;
     late Future<void> initalizeControllerFuture;
 
-    VideoPlayerController? videoController;
-    Future<void>? initializeVideoPlayerFuture;
-
     final imagePicker = ImagePicker();
 
     bool isFlipping = false;
@@ -65,14 +62,6 @@ class _CameraPageState extends State<CameraPage> {
                 content: Text( content ),
                 behavior: SnackBarBehavior.floating,
                 showCloseIcon: true
-            )
-        );
-    }
-
-    void initPoseDetector() {
-        poseDetector = PoseDetector(
-            options: PoseDetectorOptions(
-                model: poseModel,
             )
         );
     }
@@ -162,35 +151,24 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     void initLiftPreview( XFile source, bool fromGal ) async {
-        videoController = VideoPlayerController.file( File(source.path) );
-        initializeVideoPlayerFuture = videoController!.initialize();
-
-        await videoController!.setLooping(true);
-        await videoController!.play();
-
         if( !mounted ) return;
 
         await Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => FutureBuilder(
-                    future: initializeVideoPlayerFuture,
-                    builder: (context, snapshot) {
-                        if( snapshot.connectionState == ConnectionState.done ) {
-
-                            return LiftPreview(
-                                fromGal: fromGal,
-                                frontOrBack: frontOrBack,
-                                paintList: paintList,
-                                source: source,
-                                settings: widget.settings,
-                                videoController: videoController!
-                            );
-
-                        } else {
-                            return const Center( child: CircularProgressIndicator.adaptive() );
-                        }
-                    }
+                builder: (context) => LiftPreview(
+                    fromGal: fromGal,
+                    paintList: paintList,
+                    settings: widget.settings,
+                    source: source,
                 )
+            )
+        );
+    }
+
+    void initPoseDetector() {
+        poseDetector = PoseDetector(
+            options: PoseDetectorOptions(
+                model: poseModel,
             )
         );
     }
@@ -211,7 +189,6 @@ class _CameraPageState extends State<CameraPage> {
     @override
     void dispose() {
         cameraController.dispose();
-        videoController?.dispose();
         if( enableTracking ) poseDetector?.close();
 
         super.dispose();
@@ -247,7 +224,7 @@ class _CameraPageState extends State<CameraPage> {
                                     } else {
                                         paintList.clear();
                                         try {
-                                            final galleryVideo = await imagePicker.pickVideo(source: ImageSource.gallery);
+                                            final galleryVideo = await imagePicker.pickVideo( source: ImageSource.gallery );
 
                                             if( galleryVideo != null ) initLiftPreview( galleryVideo, true );
                                         } catch (e) {
@@ -268,14 +245,12 @@ class _CameraPageState extends State<CameraPage> {
                                     try {
                                         if( isRecording ) {
                                             setState( () => isRecording = false );
-                            
 
                                             final recording = await cameraController.stopVideoRecording();
+
                                             initLiftPreview( recording, false );
 
-                                            if( enableTracking ) {
-                                                cameraController.startImageStream(processCameraImage);
-                                            }
+                                            if( enableTracking ) cameraController.startImageStream(processCameraImage);
                                         } else {
                                             setState( () => isRecording = true );
 
@@ -346,19 +321,15 @@ class LiftPreview extends StatefulWidget {
     const LiftPreview({
         super.key,
         required this.fromGal,
-        required this.frontOrBack,
         required this.paintList,
-        required this.source,
         required this.settings,
-        required this.videoController
+        required this.source
     });
 
     final bool fromGal;
-    final bool? frontOrBack;
     final List<CustomPaint?> paintList;
-    final XFile source;
     final SharedPreferences settings; 
-    final VideoPlayerController videoController;
+    final XFile source;
 
     @override
     State<LiftPreview> createState() => _LiftPreviewState();
@@ -366,10 +337,12 @@ class LiftPreview extends StatefulWidget {
 
 class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin {
 
+    late VideoPlayerController videoController;
+    late Future<void> initializeVideoPlayerFuture;
     late AnimationController linearProgressController;
-    int bruh = 0;
 
     late bool enableTracking;
+    late bool frontOrBack;
 
     bool renamedFiles = false;
     bool saved = false;
@@ -392,21 +365,26 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
     void initState() {
         super.initState();
 
-        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
+        videoController = VideoPlayerController.file( File(widget.source.path) );
+        initializeVideoPlayerFuture = videoController.initialize().then((_) {
+            linearProgressController = AnimationController( // TODO: fix slight offset in progress line and video duration
+                vsync: this,
+                duration: videoController.value.duration
+            )..addListener(() {
+                setState( () {} );
+            })
+            ..repeat();
+        });
+        videoController..setLooping(true)..play();
 
-        linearProgressController = AnimationController(
-            vsync: this,
-            duration: widget.videoController.value.duration
-        )..addListener(() {
-            setState( () {} );
-        })
-        ..repeat();
+        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
+        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
     }
 
     @override
     void dispose() {
         linearProgressController.dispose();
-        widget.videoController.dispose();
+        videoController.dispose();
 
         super.dispose();
     }
@@ -417,80 +395,89 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
             appBar: AppBar(
                 title: const Text( "Your lift" )
             ),
-            body: Stack(
-                children: [
-                    Center(
-                        child: AspectRatio(
-                            aspectRatio: widget.videoController.value.aspectRatio,
-                            child: VideoPlayer( widget.videoController )
-                        )
-                    ),
-                    Center(
-                        child: ValueListenableBuilder(
-                            valueListenable: linearProgressController,
-                            builder: ( context, value, child ) {
-                                return Transform.flip(
-                                    flipX: !widget.frontOrBack!,
+            body: FutureBuilder(
+                future: initializeVideoPlayerFuture,
+                builder: ( context, snapshot ) {
+                    if( snapshot.connectionState == ConnectionState.done ) {
+                        return Stack(
+                            children: [
+                                Center(
                                     child: AspectRatio(
-                                        aspectRatio: widget.videoController.value.aspectRatio,
-                                        child: widget.paintList.isNotEmpty && enableTracking ? widget.paintList[ (value * widget.paintList.length).floor() ] : null // TODO: fix delay
+                                        aspectRatio: videoController.value.aspectRatio,
+                                        child: VideoPlayer( videoController )
                                     )
-                                );
-                            }
-                        )
-                    ),
-                    Align(
-                        alignment: Alignment.bottomCenter,
-                        child: LinearProgressIndicator(
-                            value: linearProgressController.value
-                        )
-                    ),
-                    Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton( // Tracking button
-                                onPressed: () {
-                                    setState( () => enableTracking = !enableTracking );
-                                },
-                                child: Icon( enableTracking ? Icons.visibility : Icons.visibility_off )
-                            )
-                        )
-                    ),
-                    Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton( // Play button
-                                onPressed: () {
-                                    if( widget.videoController.value.isPlaying ) {
-                                        linearProgressController.stop();
-                                        widget.videoController.pause();
-                                    } else {
-                                        linearProgressController
-                                            ..forward()
-                                            ..repeat();
-                                        widget.videoController.play();
-                                    }
-                                    setState( () {} );
-                                },
-                                child: Icon( widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow )
-                            )
-                        )
-                    ),
-                    Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: FloatingActionButton( // Mute button
-                                onPressed: () {
-                                    widget.videoController.setVolume( 1 - widget.videoController.value.volume );
-                                },
-                                child: Icon( widget.videoController.value.volume == 0 ? Icons.volume_off : Icons.volume_up )
-                            )
-                        )
-                    )
-                ] 
+                                ),
+                                Center(
+                                    child: ValueListenableBuilder(
+                                        valueListenable: linearProgressController,
+                                        builder: ( context, value, child ) {
+                                            return Transform.flip(
+                                                flipX: !frontOrBack, // TODO: frontOrBack incompatible with gallery videos
+                                                child: AspectRatio(
+                                                    aspectRatio: videoController.value.aspectRatio,
+                                                    child: widget.paintList.isNotEmpty && enableTracking ? widget.paintList[ (value * widget.paintList.length).floor() ] : null // TODO: fix delay
+                                                )
+                                            );
+                                        }
+                                    )
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: LinearProgressIndicator(
+                                        value: linearProgressController.value
+                                    )
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: FloatingActionButton( // Tracking button
+                                            onPressed: () {
+                                                setState( () => enableTracking = !enableTracking );
+                                            },
+                                            child: Icon( enableTracking ? Icons.visibility : Icons.visibility_off )
+                                        )
+                                    )
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: FloatingActionButton( // Play button
+                                            onPressed: () {
+                                                if( videoController.value.isPlaying ) {
+                                                    linearProgressController.stop();
+                                                    videoController.pause();
+                                                } else {
+                                                    linearProgressController
+                                                        ..forward()
+                                                        ..repeat();
+                                                    videoController.play();
+                                                }
+                                                setState( () {} );
+                                            },
+                                            child: Icon( videoController.value.isPlaying ? Icons.pause : Icons.play_arrow )
+                                        )
+                                    )
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: FloatingActionButton( // Mute button
+                                            onPressed: () {
+                                                videoController.setVolume( 1 - videoController.value.volume );
+                                            },
+                                            child: Icon( videoController.value.volume == 0 ? Icons.volume_off : Icons.volume_up )
+                                        )
+                                    )
+                                )
+                            ]
+                        );
+                    } else {
+                        return const Center( child: CircularProgressIndicator.adaptive() );
+                    }
+                }
             ),
             bottomNavigationBar: NavigationBar(
                 onDestinationSelected: (value) async {
@@ -543,6 +530,6 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                     )
                 ]
             )
-        );
+        );   
     }
 }
