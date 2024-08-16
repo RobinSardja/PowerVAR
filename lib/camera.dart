@@ -245,20 +245,14 @@ class _CameraPageState extends State<CameraPage> {
                                     try {
                                         if( isRecording ) {
                                             setState( () => isRecording = false );
-
-                                            final recording = await cameraController.stopVideoRecording();
-
-                                            initLiftPreview( recording, false );
-
+                                            initLiftPreview( await cameraController.stopVideoRecording(), false );
                                             if( enableTracking ) cameraController.startImageStream(processCameraImage);
                                         } else {
                                             setState( () => isRecording = true );
-
                                             if( enableTracking ) {
                                                 paintList.clear();
                                                 cameraController.stopImageStream();
                                             } 
-
                                             await cameraController.prepareForVideoRecording();
                                             await cameraController.startVideoRecording( onAvailable: enableTracking ? processCameraImage : null );
                                         }
