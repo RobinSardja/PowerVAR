@@ -10,6 +10,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 	@override
 	Widget build(BuildContext context) {
-		return const Placeholder();
+		return Center(
+            child: ListView(
+                shrinkWrap: true,
+                children: [
+                    ListTile(
+                        title: TextButton(
+                            onPressed: () {},
+                            child: const Text( "Tutorial" )
+                        ),
+                    ),
+                    ListTile(
+                        title: TextButton(
+                            onPressed: () {},
+                            child: const Text( "About" )
+                        ),
+                    ),
+                    ListTile(
+                        title: TextButton(
+                            onPressed: () {},
+                            child: const Text( "Support" )
+                        ),
+                    )
+                ],
+            )
+        );
 	}
 }
