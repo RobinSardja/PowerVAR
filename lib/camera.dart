@@ -502,7 +502,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             }
                             break;
                         case 2:
-                            if( !saved ) {
+                            if( !saved && !widget.fromGal ) {
                                 simpleSnackBar( "Lift discarded" );
                             }
 
