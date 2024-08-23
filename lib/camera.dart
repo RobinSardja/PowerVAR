@@ -15,6 +15,7 @@ import "package:shared_preferences/shared_preferences.dart";
 import "package:video_player/video_player.dart";
 
 import "pose_detection/pose_painter.dart";
+import "default_data.dart";
 
 class CameraPage extends StatefulWidget {
 	const CameraPage({
@@ -177,10 +178,10 @@ class _CameraPageState extends State<CameraPage> {
     void initState() {
         super.initState();
 
-        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
-        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
-        poseModel = (widget.settings.getBool( "hyperAccuracy" ) ?? false) ? PoseDetectionModel.accurate : PoseDetectionModel.base;
-        resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? 1;
+        enableTracking = widget.settings.getBool( "enableTracking" ) ?? defaultData.enableTracking;
+        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? defaultData.frontOrBack;
+        poseModel = ( widget.settings.getBool( "hyperAccuracy" ) ?? defaultData.hyperAccuracy ) ? PoseDetectionModel.accurate : PoseDetectionModel.base;
+        resolutionPreset = widget.settings.getInt( "resolutionPreset" ) ?? defaultData.resolutionPreset;
 
         if( enableTracking ) initPoseDetector();
         initCamera();
@@ -371,8 +372,8 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
         });
         videoController..setLooping(true)..play();
 
-        enableTracking = widget.settings.getBool( "enableTracking" ) ?? true;
-        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? true;
+        enableTracking = widget.settings.getBool( "enableTracking" ) ?? defaultData.enableTracking;
+        frontOrBack = widget.settings.getBool( "frontOrBack" ) ?? defaultData.frontOrBack;
     }
 
     @override

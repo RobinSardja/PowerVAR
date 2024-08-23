@@ -2,6 +2,8 @@ import "package:flutter/material.dart";
 
 import "package:shared_preferences/shared_preferences.dart";
 
+import "default_data.dart";
+
 class SettingsPage extends StatefulWidget {
 	const SettingsPage({
         super.key,
@@ -25,10 +27,10 @@ class _SettingsPageState extends State<SettingsPage> {
     void initState() {
         super.initState();
 
-        enableTracking = widget.settings.getBool("enableTracking") ?? true;
-        hyperAccuracy = widget.settings.getBool("hyperAccuracy") ?? false;
-        generateAdvice = widget.settings.getBool("generateAdvice") ?? false;
-        resolutionPreset = widget.settings.getInt("resolutionPreset") ?? 1;
+        enableTracking = widget.settings.getBool("enableTracking") ?? defaultData.enableTracking;
+        hyperAccuracy = widget.settings.getBool("hyperAccuracy") ?? defaultData.hyperAccuracy;
+        generateAdvice = widget.settings.getBool("generateAdvice") ?? defaultData.generateAdvice;
+        resolutionPreset = widget.settings.getInt("resolutionPreset") ?? defaultData.resolutionPreset;
     }
 
 	@override
