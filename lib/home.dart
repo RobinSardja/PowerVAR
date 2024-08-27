@@ -46,8 +46,11 @@ class TutorialPage extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return const Scaffold(
-            body: Center(
+        return Scaffold(
+            appBar: AppBar(
+                title: const Text( "Tutorial" )
+            ),
+            body: const Center(
                 child: Text( "Tutorial" )
             )
         );
@@ -59,8 +62,11 @@ class AboutPage extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return const Scaffold(
-            body: Center(
+        return Scaffold(
+            appBar: AppBar(
+                title: const Text( "About" )
+            ),
+            body: const Center(
                 child: Text( "About" )
             )
         );
@@ -72,8 +78,11 @@ class SupportPage extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return const Scaffold(
-            body: Center(
+        return Scaffold(
+            appBar: AppBar(
+                title: const Text( "Support" )
+            ),
+            body: const Center(
                 child: Text( "Support" )
             )
         );
