@@ -495,9 +495,7 @@ class _LiftPreviewState extends State<LiftPreview> with TickerProviderStateMixin
                             }
                             break;
                         case 1:
-                            final result = await Share.shareXFiles( [finalFile] );
-
-                            if( result.status == ShareResultStatus.success ) {
+                            if( ( await Share.shareXFiles( [finalFile] ) ).status == ShareResultStatus.success ) {
                                 simpleSnackBar( "Lift shared!" );
                             }
                             break;
