@@ -12,24 +12,20 @@ double translateX(
     InputImageRotation rotation,
     CameraLensDirection cameraLensDirection
 ) {
-    double divisor = Platform.isIOS ? imageSize.width : imageSize.height;
+    final divisor = Platform.isIOS ? imageSize.width : imageSize.height;
+    double temp = x * canvasSize.width;
 
     switch( rotation ) {
         case InputImageRotation.rotation90deg:
-            return x * canvasSize.width / divisor;
+            return temp / divisor;
 
         case InputImageRotation.rotation270deg:
-            return canvasSize.width - x * canvasSize.width / divisor;
+            return canvasSize.width - temp / divisor;
 
         case InputImageRotation.rotation0deg:
         case InputImageRotation.rotation180deg:
-            switch( cameraLensDirection ) {
-                case CameraLensDirection.back:
-                    return x * canvasSize.width / imageSize.width;
-
-                default:
-                    return canvasSize.width - x * canvasSize.width / imageSize.width;
-            }
+            temp /= imageSize.width;
+            return cameraLensDirection == CameraLensDirection.back ? temp : canvasSize.width - temp;
     }
 }
 
@@ -40,7 +36,7 @@ double translateY(
     InputImageRotation rotation,
     CameraLensDirection cameraLensDirection
  ) {
-    double divisor = Platform.isIOS ? imageSize.height : imageSize.width;
+    final divisor = Platform.isIOS ? imageSize.height : imageSize.width;
 
     switch( rotation ) {
         case InputImageRotation.rotation90deg:
