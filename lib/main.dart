@@ -44,15 +44,9 @@ Future<void> main() async {
                     color: Colors.red
                 ),
                 switchTheme: SwitchThemeData(
-                    thumbColor: WidgetStateProperty.resolveWith((state) {
-						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;
-					}),
-                    trackColor: WidgetStateProperty.resolveWith((state) {
-						return state.contains( WidgetState.selected ) ? Colors.red : Colors.white;
-					}),
-                    trackOutlineColor: WidgetStateProperty.resolveWith((state) {
-						return state.contains( WidgetState.selected ) ? Colors.red : Colors.black;
-					})
+                    thumbColor: WidgetStateProperty.resolveWith( (state) => state.contains( WidgetState.selected ) ? Colors.white : Colors.black ),
+                    trackColor: WidgetStateProperty.resolveWith( (state) => state.contains( WidgetState.selected ) ? Colors.red : Colors.white ),
+                    trackOutlineColor: WidgetStateProperty.resolveWith( (state) => state.contains( WidgetState.selected ) ? Colors.red : Colors.black )
                 ),
                 snackBarTheme: const SnackBarThemeData(
                     backgroundColor: Colors.white,
@@ -74,11 +68,10 @@ Future<void> main() async {
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.red,
 					indicatorColor: Colors.white,
-					iconTheme: WidgetStateProperty.resolveWith((state) {
-						return IconThemeData(
+					iconTheme: WidgetStateProperty.resolveWith( (state) => IconThemeData(
 							color: state.contains( WidgetState.selected ) ? Colors.black : Colors.white
-						);
-					}),
+						)
+					),
 					labelTextStyle: const WidgetStatePropertyAll(
 						TextStyle(
 							color: Colors.white
@@ -107,12 +100,8 @@ Future<void> main() async {
                     color: Colors.white
                 ),
                 switchTheme: SwitchThemeData(
-                    thumbColor: WidgetStateProperty.resolveWith((state) {
-					    return state.contains( WidgetState.selected ) ? Colors.black : Colors.white;
-					}),
-                    trackColor: WidgetStateProperty.resolveWith((state) {
-						return state.contains( WidgetState.selected ) ? Colors.white : Colors.black;
-					}),
+                    thumbColor: WidgetStateProperty.resolveWith( (state) => state.contains( WidgetState.selected ) ? Colors.black : Colors.white ),
+                    trackColor: WidgetStateProperty.resolveWith(( state) => state.contains( WidgetState.selected ) ? Colors.white : Colors.black ),
                     trackOutlineColor: const WidgetStatePropertyAll(
                         Colors.white,
                     )
@@ -137,11 +126,10 @@ Future<void> main() async {
 				navigationBarTheme: NavigationBarThemeData(
 					backgroundColor: Colors.black,
 					indicatorColor: Colors.white,
-					iconTheme: WidgetStateProperty.resolveWith((state) {
-						return IconThemeData(
+					iconTheme: WidgetStateProperty.resolveWith( (state) => IconThemeData(
 							color: state.contains( WidgetState.selected ) ? Colors.black : Colors.white
-						);
-					}),
+						)
+                    ),
 					labelTextStyle: const WidgetStatePropertyAll(
 						TextStyle(
 							color: Colors.white
